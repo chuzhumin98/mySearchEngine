@@ -6,7 +6,9 @@ import java.io.IOException;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -14,6 +16,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class TestInderWriter {
@@ -22,8 +25,9 @@ public class TestInderWriter {
         System.out.println("*****************检索开始**********************");    
         Directory directory = FSDirectory.open(new File("index"));   
         IKAnalyzer analyzer = new IKAnalyzer();  
-        IndexWriter writer = new IndexWriter(directory, analyzer,true, IndexWriter.MaxFieldLength.UNLIMITED);  
-        Document doc = new Document();    
+        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_35, analyzer);
+        iwc.setOpenMode(OpenMode.CREATE);
+        IndexWriter writer = new IndexWriter(directory, iwc);    
         
         ReadDocs.startRead("import/CNKI_journal_v2.txt");
 		int count = 0;
@@ -33,12 +37,12 @@ public class TestInderWriter {
 			if (temp == null) {
 				break;
 			} else {
+				Document doc = new Document();  
 				doc.add(new Field("main", temp, Field.Store.YES, Field.Index.ANALYZED));
 				writer.addDocument(doc); 
 				count++;
 				if (count % 100 == 0) {
 					System.out.println("doc "+count);
-					break;
 					//System.out.println(temp);
 				}
 			}
