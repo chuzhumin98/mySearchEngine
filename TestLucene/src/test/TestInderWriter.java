@@ -32,7 +32,7 @@ public class TestInderWriter {
         ReadDocs.startRead("import/CNKI_journal_v2.txt");
 		int count = 0;
 		while (true) {
-			String temp = ReadDocs.getNameInfoperDoc();
+			String temp = ReadDocs.getFieldInfoperDoc("题名");
 			//System.out.println(temp);
 			if (temp == null) {
 				break;

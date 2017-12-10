@@ -20,6 +20,9 @@ public class TestIndexSearcher {
 	private Analyzer analyzer;
 	private QueryParser qp;
 	
+	/*
+	 * 构造函数，初始化解析器等
+	 */
 	public TestIndexSearcher(String path){
 		analyzer = new IKAnalyzer();
 		try{
@@ -31,6 +34,9 @@ public class TestIndexSearcher {
 		}
 	}
 	
+	/*
+	 * 在某个特定域中搜索结果
+	 */
 	public TopDocs searchQuery(String queryString,String field,int maxnum){
 		try {
 			Query query= qp.parse(queryString);
@@ -43,6 +49,9 @@ public class TestIndexSearcher {
 		return null;
 	}
 	
+	/*
+	 * 根据docID获取与之对应的doc
+	 */
 	public Document getDoc(int docID){
 		try{
 			return searcher.doc(docID);
@@ -53,13 +62,15 @@ public class TestIndexSearcher {
 	}
 	
 	public static void main(String[] args){
-		TestIndexSearcher search=new TestIndexSearcher("index");		
-		TopDocs results=search.searchQuery("工业", "main", 10);
+		TestIndexSearcher search=new TestIndexSearcher("index");	
+		System.out.println("query:工业趋势");
+		TopDocs results=search.searchQuery("工业趋势", "main", 1000);
 		ScoreDoc[] hits = results.scoreDocs;
+		System.out.println("the result number:"+hits.length);
 		for (int i = 0; i < hits.length; i++) { // output raw format
 			Document doc = search.getDoc(hits[i].doc);
-			System.out.println("max "+ (i+1) + ":"+doc.get("main")+
-					" score:"+doc.get("score"));
+			System.out.println("top "+ (i+1) + ":"+doc.get("main")+
+					" score:"+hits[i].score);
 		}
 	}
 }

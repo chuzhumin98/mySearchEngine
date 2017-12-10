@@ -60,19 +60,11 @@ public class ReadDocs {
 	}
 	
 	/*
-	 * 仅读取某个文档中的题名内容
+	 * 针对某个特定文档的某个特定域的提取
 	 */
-	public static String getNameInfoperDoc() {
-		if (!hasSet) {
-			ReadDocs.startRead("import/CNKI_journal_v2.txt");
-		}
-		String totalString = ReadDocs.getTotalInfoPerDoc();
-		if (totalString == null) {
-			return null;
-		}
-		String total = ""; //所有的题名信息
-		String forCompare = "<" + "题名";
-		BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(totalString.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));  
+	public static String getFieldperDoc(BufferedReader br, String fieldName) {
+		String forCompare = "<" + fieldName;
+		String total = ""; //所有与该域相关的信息
 		while (true) {
 			try {
 				String temp = br.readLine();
@@ -113,17 +105,54 @@ public class ReadDocs {
 		return total;
 	}
 	
+	/*
+	 * 仅读取某个文档中的特定域的内容
+	 */
+	public static String getFieldInfoperDoc(String fieldName) {
+		if (!hasSet) {
+			ReadDocs.startRead("import/CNKI_journal_v2.txt");
+		}
+		String totalString = ReadDocs.getTotalInfoPerDoc();
+		if (totalString == null) {
+			return null;
+		}
+		BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream
+				(totalString.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+		String total = ReadDocs.getFieldperDoc(br, fieldName);
+		return total;
+	}
+	
+	/*
+	 * 仅读取某个文档中的一些特定域的内容
+	 */
+	public static String[] getFieldsInfoperDoc(String[] fieldsName) {
+		// TODO Auto-generated method stub
+		if (!hasSet) {
+			ReadDocs.startRead("import/CNKI_journal_v2.txt");
+		}
+		String totalString = ReadDocs.getTotalInfoPerDoc();
+		if (totalString == null) {
+			return null;
+		}
+		String[] totals = new String [fieldsName.length];
+		for (int i = 0; i < fieldsName.length; i++) {
+			BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream
+					(totalString.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+			totals[i] = ReadDocs.getFieldperDoc(br, fieldsName[i]);
+		}
+		return totals;
+	} 
+	
 	public static void main(String[] args) {
 		ReadDocs.startRead("import/CNKI_journal_v2.txt");
-		while (true) {
-			String name = ReadDocs.getNameInfoperDoc();
-			if (name == null) {
-				break;
-			} else {
-				System.out.println(name);
-			}
-		}
-		/*int count = 0;
+		ReadDocs.testForFieldsRead();
+	}
+	
+	/*
+	 * 检测getTotalInfoPerDoc()方法的正确性
+	 */
+	private static void testForTotalRead() {
+		int count = 0;
 		while (true) {
 			String temp = ReadDocs.getTotalInfoPerDoc();
 			if (temp == null) {
@@ -136,6 +165,35 @@ public class ReadDocs {
 				}
 			}
 		}
-		System.out.println("total docs num:"+count);  */
-	} 
+		System.out.println("total docs num:"+count);  
+	}
+	
+	/*
+	 * 检测getFieldInfoperDoc()方法的正确性
+	 */
+	private static void testForFieldRead() {
+		while (true) {
+			String name = ReadDocs.getFieldInfoperDoc("题名");
+			if (name == null) {
+				break;
+			} else {
+				System.out.println(name);
+			}
+		}
+	}
+	
+	/*
+	 * 检测getFieldsInfoperDoc()方法的正确性
+	 */
+	private static void testForFieldsRead() {
+		for (int i = 0; i < 10; i++) {
+			String[] fieldsName = {"题名", "作者", "摘要", "基金", "不存在的"};
+			String name[] = ReadDocs.getFieldsInfoperDoc(fieldsName);
+			System.out.println("for the result " + (i+1));
+			for (int j = 0; j < name.length; j++) {
+				System.out.println(fieldsName[j]+":"+name[j]);
+			}
+		}
+	}
+	
 }
