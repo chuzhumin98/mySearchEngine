@@ -20,6 +20,8 @@ import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class TestInderWriter {
+	public static String[] fieldsName = {"题名", "作者", "摘要", "年"};
+	public static boolean[] beAnalyzed = {true, true, true, false};
 	public static void main(String[] args) throws IOException {  
         long startTime = System.currentTimeMillis();  
         System.out.println("*****************检索开始**********************");    
@@ -31,17 +33,24 @@ public class TestInderWriter {
         
         ReadDocs.startRead("import/CNKI_journal_v2.txt");
 		int count = 0;
+		
 		while (true) {
-			String temp = ReadDocs.getFieldInfoperDoc("题名");
+			String results[] = ReadDocs.getFieldsInfoperDoc(fieldsName);
 			//System.out.println(temp);
-			if (temp == null) {
+			if (results == null) {
 				break;
 			} else {
 				Document doc = new Document();  
-				doc.add(new Field("main", temp, Field.Store.YES, Field.Index.ANALYZED));
+				for (int i = 0; i < fieldsName.length; i++) {
+					if (beAnalyzed[i]) {
+						doc.add(new Field(fieldsName[i], results[i], Field.Store.YES, Field.Index.ANALYZED));
+					} else {
+						doc.add(new Field(fieldsName[i], results[i], Field.Store.YES, Field.Index.NOT_ANALYZED));
+					}
+				}
 				writer.addDocument(doc); 
 				count++;
-				if (count % 100 == 0) {
+				if (count % 1000 == 0) {
 					System.out.println("doc "+count);
 					//System.out.println(temp);
 				}

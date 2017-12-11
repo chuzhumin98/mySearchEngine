@@ -28,7 +28,6 @@ public class TestIndexSearcher {
 		try{
 			reader = IndexReader.open(FSDirectory.open(new File(path)));
 			searcher = new IndexSearcher(reader);
-			qp = new QueryParser(Version.LUCENE_35, "main", analyzer);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -37,8 +36,14 @@ public class TestIndexSearcher {
 	/*
 	 * 在某个特定域中搜索结果
 	 */
-	public TopDocs searchQuery(String queryString,String field,int maxnum){
+	public TopDocs searchQueryOneField(String queryString,String field,int maxnum,boolean beAnalyzed){
 		try {
+			if (beAnalyzed) {
+				qp = new QueryParser(Version.LUCENE_35, field, analyzer);
+			} else {
+				qp = new QueryParser(Version.LUCENE_35, field, null);
+			}
+			
 			Query query= qp.parse(queryString);
 			query.setBoost(1.0f);
 			TopDocs results = searcher.search(query, maxnum);
@@ -64,12 +69,12 @@ public class TestIndexSearcher {
 	public static void main(String[] args){
 		TestIndexSearcher search=new TestIndexSearcher("index");	
 		System.out.println("query:工业趋势");
-		TopDocs results=search.searchQuery("工业趋势", "main", 1000);
+		TopDocs results=search.searchQueryOneField("2012", "年", 100, true);
 		ScoreDoc[] hits = results.scoreDocs;
 		System.out.println("the result number:"+hits.length);
 		for (int i = 0; i < hits.length; i++) { // output raw format
 			Document doc = search.getDoc(hits[i].doc);
-			System.out.println("top "+ (i+1) + ":"+doc.get("main")+
+			System.out.println("top "+ (i+1) + ":"+doc.get("摘要")+
 					" score:"+hits[i].score);
 		}
 	}
