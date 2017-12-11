@@ -26,12 +26,13 @@ public class TestIndexSearcher {
 	private IndexSearcher searcher;
 	private Analyzer analyzer;
 	public static int analyzerMethod = 4;
-	public static int searchState = 1;
-	public static int indexPath = 4; //对应的index的位置
+	public static int searchState = -1;
+	public static int indexPath = 5; //对应的index的位置
 	public static float[] boostsValue = {8, 10, 1, 2};
 	public static String[] pathIndex = {"index/simpleIKanalyzer",
 			"index/simpleStandardAnalyzer", "index/simpleCJKAnalyzer",
-			"index/simplePaodingAnalyzer", "index/simpleStandardAnalyzerEnglish"}; //对应的index的位置 
+			"index/simplePaodingAnalyzer", "index/simpleStandardAnalyzerEnglish",
+			"index/simpleToy"}; //对应的index的位置 
 	private Map<String, Float> fieldBoosts;
 	public static String[] myfieldsName; //指向现在需要使用的域的引用
 	
@@ -39,11 +40,15 @@ public class TestIndexSearcher {
 	 * 获取
 	 */
 	public static void getFieldsName() {
-		if (searchState == 0) {
+		switch (searchState) {
+		case 0:
 			myfieldsName = TestIndexWriter.fieldsName;
-		} 
-		if (searchState == 1) {
+			break;
+		case 1:
 			myfieldsName = TestIndexWriter.fieldsNameEnglish;
+			break;
+		default:
+			myfieldsName = TestIndexWriter.fieldsName;
 		}
 	}
 	
@@ -52,6 +57,9 @@ public class TestIndexSearcher {
 	 */
 	private static Analyzer getAnalyzer() {
 		Analyzer tmp = null;
+		if (searchState == -1) {
+			tmp = new IKAnalyzer();
+		}
 		if (searchState == 0) { //简单中文查询
 			switch (analyzerMethod) {
 	        case 0:
@@ -79,6 +87,7 @@ public class TestIndexSearcher {
 	/*
 	 * 构造函数，初始化解析器等
 	 */
+	@SuppressWarnings("static-access")
 	public TestIndexSearcher(String path){
 		analyzer = this.getAnalyzer();
 		getFieldsName();
@@ -128,6 +137,12 @@ public class TestIndexSearcher {
 		return null;
 	}
 	
+	/*
+	 * 将所有内容看成一个域进行搜索
+	 */
+	public TopDocs searchQueryTotal(String queryString, int maxnum){ 
+		return this.searchQueryOneField(queryString, "total", maxnum);
+	}
 	
 	/*
 	 * 根据docID获取与之对应的doc
@@ -153,19 +168,31 @@ public class TestIndexSearcher {
 	
 	public static void main(String[] args){
 		TestIndexSearcher search=new TestIndexSearcher(
-				TestIndexSearcher.pathIndex[TestIndexSearcher.analyzerMethod]);	//找到对应方法的路径
+				TestIndexSearcher.pathIndex[indexPath]);	//找到对应方法的路径
 		/*
 		 * query:江泽民，非常好地诠释CJK存在一定问题的例子
 		 */
 		System.out.println("query:Application");
 		//TopDocs results=search.searchQueryOneField("2012", "年", 100);
-		TopDocs results = search.searchQueryFields("application", 1000);
-		ScoreDoc[] hits = results.scoreDocs;
-		System.out.println("the result number:"+hits.length);
-		for (int i = 0; i < Math.min(hits.length, 100); i++) { // output raw format
-			Document doc = search.getDoc(hits[i].doc);
-			System.out.println("top "+ (i+1) + ":\n"+toDocString(doc)+
-					"score:"+hits[i].score);
-		}
+		TopDocs results;
+		if (searchState == -1) {
+			results = search.searchQueryTotal("application", 1000);
+			ScoreDoc[] hits = results.scoreDocs;
+			System.out.println("the result number:"+hits.length);
+			for (int i = 0; i < Math.min(hits.length, 20); i++) { // output raw format
+				Document doc = search.getDoc(hits[i].doc);
+				System.out.println("top "+ (i+1) + ":\n"+doc.get("total")+
+						"score:"+hits[i].score);
+			}
+		} else {
+			results = search.searchQueryFields("application", 1000);
+			ScoreDoc[] hits = results.scoreDocs;
+			System.out.println("the result number:"+hits.length);
+			for (int i = 0; i < Math.min(hits.length, 100); i++) { // output raw format
+				Document doc = search.getDoc(hits[i].doc);
+				System.out.println("top "+ (i+1) + ":\n"+toDocString(doc)+
+						"score:"+hits[i].score);
+			}
+		}	 
 	}
 }
