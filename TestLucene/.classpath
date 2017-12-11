@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="lib/lucene-core-3.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/THULAC_lite_java_run.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-analyzers-3.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/paoding-analysis-2.0.4-beta.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
