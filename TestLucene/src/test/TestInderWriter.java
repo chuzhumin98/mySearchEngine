@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.cjk.CJKAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -23,24 +24,40 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class TestInderWriter {
 	public static String[] fieldsName = {"题名", "作者", "摘要", "年"};
-	public static int analyzerMethod = 1; //0表示IKAnalyzer,1表示StandardAnalyzer(对中文按字分词)
+	public static int analyzerMethod = 2; //0表示IKAnalyzer,1表示StandardAnalyzer(对中文按字分词),2表示CJKAnalyzer
 	public static boolean[] beAnalyzed = {true, true, true, false};
 	public static float[] boostsValue = {8, 10, 1, 2};
 	static Analyzer analyzer;
+	public static String[] pathIndex = {"index/simpleIKanalyzer",
+			"index/simpleStandardAnalyzer", "index/simpleCJKAnalyzer"}; //对应的index的位置 
+	
+	/*
+	 * 获取对应的分词器
+	 */
+	private static Analyzer getAnalyzer() {
+		Analyzer tmp = null;
+		switch (analyzerMethod) {
+        case 0:
+        	tmp = new IKAnalyzer(); 
+        	break;
+        case 1:
+        	tmp = new StandardAnalyzer(Version.LUCENE_35);
+        	break;
+        case 2:
+        	tmp = new CJKAnalyzer(Version.LUCENE_35);
+        	break;
+        default:
+        	tmp = new IKAnalyzer(); 
+        }
+		return tmp;
+	}
+	
 	public static void main(String[] args) throws IOException {  
         long startTime = System.currentTimeMillis();  
         System.out.println("*****************检索开始**********************");    
-        Directory directory = FSDirectory.open(new File("index/simpleStandardAnalyzer"));  
-        switch (analyzerMethod) {
-        case 0:
-        	analyzer = new IKAnalyzer(); 
-        	break;
-        case 1:
-        	analyzer = new StandardAnalyzer(Version.LUCENE_35);
-        	break;
-        default:
-        	analyzer = new IKAnalyzer(); 
-        }      
+        Directory directory = FSDirectory.open(new File(pathIndex[analyzerMethod]));  
+        analyzer = getAnalyzer();  
+        System.out.println(analyzer.toString());
         IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_35, analyzer);
         iwc.setOpenMode(OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(directory, iwc);    
@@ -83,7 +100,7 @@ public class TestInderWriter {
         for (int i = 0; i < rs.scoreDocs.length; i++) {  
             // rs.scoreDocs[i].doc 是获取索引中的标志位id, 从0开始记录  
             Document firstHit = searcher.doc(rs.scoreDocs[i].doc);  
-            System.out.println(firstHit.getField("main").stringValue());   
+            System.out.println(firstHit.getField("题名").stringValue());   
         }  
         writer.close();  
         directory.close();  

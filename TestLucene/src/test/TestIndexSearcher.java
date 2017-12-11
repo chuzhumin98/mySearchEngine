@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.cjk.CJKAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -22,24 +23,37 @@ public class TestIndexSearcher {
 	private IndexReader reader;
 	private IndexSearcher searcher;
 	private Analyzer analyzer;
-	public static int analyzerMethod = 1;
-	public static String[] pathIndex = {"index/simpleIKanalyzer", "index/simpleStandardAnalyzer"}; //对应的index的位置，需要减一使用 
+	public static int analyzerMethod = 0;
+	public static String[] pathIndex = {"index/simpleIKanalyzer",
+			"index/simpleStandardAnalyzer", "index/simpleCJKAnalyzer"}; //对应的index的位置 
 	private Map<String, Float> fieldBoosts;
+	
+	/*
+	 * 获取对应的分词器
+	 */
+	private Analyzer getAnalyzer() {
+		Analyzer tmp = null;
+		switch (analyzerMethod) {
+        case 0:
+        	tmp = new IKAnalyzer(); 
+        	break;
+        case 1:
+        	tmp = new StandardAnalyzer(Version.LUCENE_35);
+        	break;
+        case 2:
+        	tmp = new CJKAnalyzer();
+        	break;
+        default:
+        	tmp = new IKAnalyzer(); 
+        }
+		return tmp;
+	}
 	
 	/*
 	 * 构造函数，初始化解析器等
 	 */
 	public TestIndexSearcher(String path){
-		switch (analyzerMethod) {
-        case 0:
-        	analyzer = new IKAnalyzer(); 
-        	break;
-        case 1:
-        	analyzer = new StandardAnalyzer(Version.LUCENE_35);
-        	break;
-        default:
-        	analyzer = new IKAnalyzer(); 
-        }
+		analyzer = this.getAnalyzer();
 		try{
 			reader = IndexReader.open(FSDirectory.open(new File(path)));
 			searcher = new IndexSearcher(reader);
@@ -110,9 +124,9 @@ public class TestIndexSearcher {
 	public static void main(String[] args){
 		TestIndexSearcher search=new TestIndexSearcher(
 				TestIndexSearcher.pathIndex[TestIndexSearcher.analyzerMethod]);	//找到对应方法的路径
-		System.out.println("query:工业挖掘");
+		System.out.println("query:江泽民");
 		//TopDocs results=search.searchQueryOneField("2012", "年", 100);
-		TopDocs results = search.searchQueryFields("工业挖掘", 100);
+		TopDocs results = search.searchQueryFields("江泽民", 1000);
 		ScoreDoc[] hits = results.scoreDocs;
 		System.out.println("the result number:"+hits.length);
 		for (int i = 0; i < hits.length; i++) { // output raw format
