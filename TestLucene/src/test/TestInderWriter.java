@@ -22,6 +22,7 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 public class TestInderWriter {
 	public static String[] fieldsName = {"题名", "作者", "摘要", "年"};
 	public static boolean[] beAnalyzed = {true, true, true, false};
+	public static float[] boostsValue = {8, 10, 1, 2};
 	public static void main(String[] args) throws IOException {  
         long startTime = System.currentTimeMillis();  
         System.out.println("*****************检索开始**********************");    

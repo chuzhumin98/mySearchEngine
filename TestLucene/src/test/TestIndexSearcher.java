@@ -2,6 +2,9 @@ package test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -19,6 +22,7 @@ public class TestIndexSearcher {
 	private IndexSearcher searcher;
 	private Analyzer analyzer;
 	private QueryParser qp;
+	private Map<String, Float> fieldBoosts;
 	
 	/*
 	 * 构造函数，初始化解析器等
@@ -28,6 +32,10 @@ public class TestIndexSearcher {
 		try{
 			reader = IndexReader.open(FSDirectory.open(new File(path)));
 			searcher = new IndexSearcher(reader);
+			fieldBoosts = new HashMap<String, Float>();
+			for (int i = 0; i < TestInderWriter.fieldsName.length; i++) {
+				
+			}
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -38,12 +46,7 @@ public class TestIndexSearcher {
 	 */
 	public TopDocs searchQueryOneField(String queryString,String field,int maxnum,boolean beAnalyzed){
 		try {
-			if (beAnalyzed) {
-				qp = new QueryParser(Version.LUCENE_35, field, analyzer);
-			} else {
-				qp = new QueryParser(Version.LUCENE_35, field, null);
-			}
-			
+			qp = new QueryParser(Version.LUCENE_35, field, analyzer);			
 			Query query= qp.parse(queryString);
 			query.setBoost(1.0f);
 			TopDocs results = searcher.search(query, maxnum);
