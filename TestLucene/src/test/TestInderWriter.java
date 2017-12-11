@@ -3,6 +3,8 @@ package test;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
@@ -21,13 +23,24 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class TestInderWriter {
 	public static String[] fieldsName = {"题名", "作者", "摘要", "年"};
+	public static int analyzerMethod = 1; //0表示IKAnalyzer,1表示StandardAnalyzer(对中文按字分词)
 	public static boolean[] beAnalyzed = {true, true, true, false};
 	public static float[] boostsValue = {8, 10, 1, 2};
+	static Analyzer analyzer;
 	public static void main(String[] args) throws IOException {  
         long startTime = System.currentTimeMillis();  
         System.out.println("*****************检索开始**********************");    
-        Directory directory = FSDirectory.open(new File("index"));   
-        IKAnalyzer analyzer = new IKAnalyzer();  
+        Directory directory = FSDirectory.open(new File("index/simpleStandardAnalyzer"));  
+        switch (analyzerMethod) {
+        case 0:
+        	analyzer = new IKAnalyzer(); 
+        	break;
+        case 1:
+        	analyzer = new StandardAnalyzer(Version.LUCENE_35);
+        	break;
+        default:
+        	analyzer = new IKAnalyzer(); 
+        }      
         IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_35, analyzer);
         iwc.setOpenMode(OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(directory, iwc);    
@@ -62,7 +75,7 @@ public class TestInderWriter {
         System.out.println("succeed to be written to files"); 
   
         IndexSearcher searcher = new IndexSearcher(directory);   
-         Query query = new TermQuery(new Term("main", "结构"));  
+         Query query = new TermQuery(new Term("题名", "结构"));  
           
         TopDocs rs = searcher.search(query, null, 10);  
         long endTime = System.currentTimeMillis();  
