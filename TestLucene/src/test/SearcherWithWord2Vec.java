@@ -1,7 +1,11 @@
 package test;
 
+import java.awt.List;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,13 +144,61 @@ public class SearcherWithWord2Vec {
 		return strings;
 	}
 	
+	/*
+	 * 在arraylist中搜索是否含有该id的doc记录,如果没有则返回-1
+	 */
+	public int searchScoreDoc(ArrayList<ScoreDoc> mydocs, int doc) {
+		int index = -1;
+		for (int i = 0; i < mydocs.size(); i++) {
+			if (mydocs.get(i).doc == doc) {
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+	
+	/*
+	 * 加入word2vec后的权重计算方法
+	 */
+	public ScoreDoc[] searchWithWord2Vec(String queryString, int maxnum) {
+		TopDocs results = searchQueryFields(queryString, maxnum);
+		ScoreDoc[] docs = results.scoreDocs;
+		ArrayList<ScoreDoc> mydocs = new ArrayList<ScoreDoc>();
+		for (int i = docs.length-1; i >= 0; i--) {
+			int index = this.searchScoreDoc(mydocs, docs[i].doc);
+			if (index == -1) { //还不存在当前文档记录时创建一个
+				mydocs.add(docs[i]);
+			} else { //否则在当前权重上叠加
+				mydocs.get(index).score += docs[i].score;
+			}
+		}
+		
+		
+		Collections.sort(mydocs, new Comparator<ScoreDoc>() {
+		    public int compare(ScoreDoc s1, ScoreDoc s2) {
+		    	if (s2.score >= s1.score) {
+		    		return 1;
+		    	} else {
+		    		return -1;
+		    	}
+		    }
+		}); 
+		int size = Math.min(maxnum, mydocs.size()); //至多取maxnum个输出
+		docs = new ScoreDoc [size];
+		for (int i = 0; i < size; i++) {
+			docs[i] = mydocs.get(i);
+		}
+		return docs;
+	}
+	
 	public static void main(String[] args){
 		SearcherWithWord2Vec search=new SearcherWithWord2Vec(
 				SearcherWithWord2Vec.pathIndex[indexPath]);	//找到对应方法的路径
 		/*
 		 * query:江泽民，非常好地诠释CJK存在一定问题的例子
 		 */
-		System.out.println("query:Application");
+		System.out.println("query:工业");
 		//TopDocs results=search.searchQueryOneField("2012", "年", 100);
 		TopDocs results;
 		if (searchState == -1) {
@@ -159,8 +211,7 @@ public class SearcherWithWord2Vec {
 						"score:"+hits[i].score);
 			}
 		} else {
-			results = search.searchQueryFields("工业", 1000);
-			ScoreDoc[] hits = results.scoreDocs;
+			ScoreDoc[] hits = search.searchWithWord2Vec("工业", 1000);
 			System.out.println("the result number:"+hits.length);
 			for (int i = 0; i < Math.min(hits.length, 100); i++) { // output raw format
 				Document doc = search.getDoc(hits[i].doc);

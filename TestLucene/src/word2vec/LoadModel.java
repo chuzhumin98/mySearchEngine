@@ -26,7 +26,8 @@ public class LoadModel {
     		model = new LoadModel();
     		try {
 				//model.loadJavaModelTxt("word2vec/Skipgram_data");
-    			model.loadModelBin("word2vec/smallmodel.bin");
+    			//model.loadModelBin("word2vec/smallmodel.bin");
+    			model.loadModelBin("word2vec/bigmodel.bin");
 				System.out.println("succeed load skip-gram model!");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -160,8 +161,8 @@ public class LoadModel {
 		long startTime = System.currentTimeMillis();
 		LoadModel w1 = LoadModel.getInstance();
 
-		System.out.println(w1.distance("中国"));
-		System.out.println(w1.distance("改革"));      
+		System.out.println(w1.distance("美国"));
+		System.out.println(w1.distance("电脑"));      
 		System.out.println(w1.distance("中心"));
 		System.out.println(w1.distance("江泽民"));
 		System.out.println(w1.distance("记者"));
