@@ -1,7 +1,10 @@
 package word2vec;
 
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -77,6 +80,7 @@ public class ReadModel {
 		}
 	}
 	
+	
 	public Set<WordEntry> distance(String queryWord) {
 
 		float[] center = wordMap.get(queryWord);
@@ -111,8 +115,34 @@ public class ReadModel {
 	/*
 	 * 改变模型的存储形式
 	 */
-	public void saveAsObject() {
-		
+	public void saveAsObject(String path) {
+		try {
+    	    PrintStream out = new PrintStream(new File(path));
+    	    ReadModel w1 = ReadModel.getInstance();
+   			int count = 0;
+   			for (Map.Entry<String, float[]> entry : w1.wordMap.entrySet()) {
+   				String term = entry.getKey();
+   				float[] vector = entry.getValue();
+   				JSONObject json1 = new JSONObject();
+   				json1.put("term", term);
+   				ArrayList<Float> arl1 = new ArrayList<Float>();
+   				for (int i = 0; i < vector.length; i++) {
+   					arl1.add(vector[i]);
+   				}
+   				json1.put("vector", arl1);
+   				String strings = json1.toString();
+   				out.println(strings);
+   				//System.out.println(term+":"+w1.distance(term));
+   				count++;
+   				if (count % 1000 == 0) {
+   					System.out.println("process "+count);
+   				}
+   			}
+   			System.out.println("succeed written to file");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 	}
 	
 	/*
@@ -152,9 +182,48 @@ public class ReadModel {
 		
 	}
 	
+	 //对于大量数据的写入，使用缓冲流BufferedOutputStream类可以提高效率  
+    public void saveBinModel(String fileName) {    
+        try {  
+            DataOutputStream out=new DataOutputStream(  
+                                 new BufferedOutputStream(  
+                                 new FileOutputStream(fileName)));  
+            ReadModel w1 = ReadModel.getInstance();
+   			int count = 0;
+   			out.writeInt(this.words);
+   			out.writeInt(this.size);
+   			for (Map.Entry<String, float[]> entry : w1.wordMap.entrySet()) {
+   				String term = entry.getKey();
+   				float[] vector = entry.getValue();
+   				out.writeUTF(term);
+   				for (int i = 0; i < vector.length; i++) {
+   					out.writeDouble(vector[i]);
+   				}
+   				count++;
+   				if (count % 10000 == 0) {
+   					System.out.println("process "+count);
+   				}
+   			}
+   			System.out.println("succeed written to file");
+            out.close();  
+        } catch (Exception e)  
+        {  
+            e.printStackTrace();  
+        }  
+    }  
+	
 	public static void main(String[] args) throws IOException {
+		long startTime = System.currentTimeMillis(); 
 		ReadModel w1 = ReadModel.getInstance();
-		w1.saveIndex("word2vec/big.model");
+		//w1.saveAsObject("word2vec/smallmodel.txt");
+		w1.saveBinModel("word2vec/bigmodel.bin");
+		System.out.println(w1.distance("中国"));
+		System.out.println(w1.distance("改革"));      
+		System.out.println(w1.distance("中心"));
+		System.out.println(w1.distance("江泽民"));
+		System.out.println(w1.distance("记者"));
+		long endTime = System.currentTimeMillis();  
+        System.out.println("总共花费" + (endTime - startTime) + "毫秒."); 
 	}
 }
 	
