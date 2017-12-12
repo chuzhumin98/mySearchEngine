@@ -19,7 +19,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
-import net.paoding.analysis.analyzer.PaodingAnalyzer;
 
 public class TestIndexSearcher {
 	private IndexReader reader;
@@ -72,7 +71,7 @@ public class TestIndexSearcher {
 	        	tmp = new CJKAnalyzer(Version.LUCENE_35);
 	        	break;
 	        case 3:
-	        	tmp = new PaodingAnalyzer(); 
+	        	//tmp = new PaodingAnalyzer(); 
 	        	break;
 	        default:
 	        	tmp = new IKAnalyzer(); 

@@ -3,6 +3,8 @@ package word2vec;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +12,9 @@ import java.util.Scanner;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Map.Entry;
+
+import net.sf.json.JSONObject;
 
 public class ReadModel {
 	public static ReadModel model = null;
@@ -21,8 +26,8 @@ public class ReadModel {
     	if (model == null) {
     		model = new ReadModel();
     		try {
-				//model.loadJavaModelTxt("word2vec/Skipgram_data");
-    			model.loadJavaModelTxt("word2vec/SkipgramSmall_data");
+				model.loadJavaModelTxt("word2vec/Skipgram_data");
+    			//model.loadJavaModelTxt("word2vec/SkipgramSmall_data");
 				System.out.println("succeed load skip-gram model!");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -103,18 +108,53 @@ public class ReadModel {
 		return result;
 	}
 
+	/*
+	 * 改变模型的存储形式
+	 */
+	public void saveAsObject() {
+		
+	}
+	
+	/*
+	 * 存储由word2vec建立的索引
+	 */
+	public void saveIndex(String path) {
+	       try {
+	    	    PrintStream out = new PrintStream(new File(path));
+	    	    ReadModel w1 = ReadModel.getInstance();
+	   			int count = 0;
+	   			for (Map.Entry<String, float[]> entry : w1.wordMap.entrySet()) {
+	   				String term = entry.getKey();
+	   				Set<WordEntry> result = w1.distance(term);
+	   				JSONObject json1 = new JSONObject();
+	   				json1.put("term", term);
+	   				ArrayList<JSONObject> arl1 = new ArrayList<JSONObject>();
+	   				for (WordEntry item: result) {
+	   					JSONObject json2 = new JSONObject();
+	   					json2.put("word", item.name);
+	   					json2.put("score", item.score);
+	   					arl1.add(json2);
+	   				}
+	   				json1.put("words", arl1);
+	   				String strings = json1.toString();
+	   				out.println(strings);
+	   				//System.out.println(term+":"+w1.distance(term));
+	   				count++;
+	   				if (count % 100 == 0) {
+	   					System.out.println("process "+count);
+	   				}
+	   			}
+	   			System.out.println("succeed written to file");
+	        } catch (IOException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+		
+	}
 	
 	public static void main(String[] args) throws IOException {
 		ReadModel w1 = ReadModel.getInstance();
-		System.out.println(w1.distance("中国"));
-        
-        System.out.println(w1.distance("改革"));
-        
-        System.out.println(w1.distance("中心"));
-        
-        System.out.println(w1.distance("江泽民"));
-        
-        System.out.println(w1.distance("记者"));
+		w1.saveIndex("word2vec/big.model");
 	}
 }
 	

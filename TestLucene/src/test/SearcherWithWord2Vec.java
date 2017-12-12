@@ -19,7 +19,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
-import net.paoding.analysis.analyzer.PaodingAnalyzer;
 
 public class SearcherWithWord2Vec {
 	private IndexReader reader;

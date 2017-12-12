@@ -23,8 +23,6 @@ import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
-import net.paoding.analysis.analyzer.PaodingAnalyzer;
-
 public class TestIndexWriter {
 	public static String[] fieldsName = {"题名", "作者", "摘要", "年"};
 	public static String[] fieldsNameEnglish = {"英文篇名", "英文作者", "英文摘要", "年"};
@@ -61,7 +59,7 @@ public class TestIndexWriter {
 	        	tmp = new CJKAnalyzer(Version.LUCENE_35);
 	        	break;
 	        case 3:
-	        	tmp = new PaodingAnalyzer(); 
+	        	//tmp = new PaodingAnalyzer(); 
 	        	break;
 	        default:
 	        	tmp = new IKAnalyzer(); 
