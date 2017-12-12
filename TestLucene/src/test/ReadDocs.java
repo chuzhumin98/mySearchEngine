@@ -144,8 +144,14 @@ public class ReadDocs {
 	} 
 	
 	public static void main(String[] args) {
-		ReadDocs.startRead("import/CNKI_journal_v2.txt");
-		ReadDocs.testForFieldsRead();
+		try {
+			ReadDocs.readWord2Vec();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//ReadDocs.startRead("import/CNKI_journal_v2.txt");
+		//ReadDocs.testForFieldsRead();
 	}
 	
 	/*
@@ -194,6 +200,22 @@ public class ReadDocs {
 				System.out.println(fieldsName[j]+":"+name[j]);
 			}
 		}
+	}
+	
+	public static void readWord2Vec() throws IOException {
+		try {
+			//isr = new InputStreamReader(new FileInputStream("word2vec/"
+			//		+ "news_12g_baidubaike_20g_novel_90g_embedding_64.model"), "ISO-8859-1");
+			isr = new InputStreamReader(new FileInputStream("word2vec/"
+					+ "Word60.model"), "GBK");
+			br = new BufferedReader(isr);
+			for (int i = 0; i < 4; i++) {
+				System.out.println(br.readLine());
+			}
+		} catch (UnsupportedEncodingException | FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 	}
 	
 }
