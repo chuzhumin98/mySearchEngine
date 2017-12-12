@@ -117,8 +117,8 @@ public class LoadModel {
 				wordMap.put(key, value);
 			}
 			this.words = wordMap.size();
-			System.out.println("words:"+words);
-			System.out.println("size:"+size); 
+			//System.out.println("model-words:"+words);
+			//System.out.println("vec-dim:"+size); 
             in.close();  
         } catch (Exception e)  
         {  

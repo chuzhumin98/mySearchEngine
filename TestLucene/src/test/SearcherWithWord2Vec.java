@@ -3,15 +3,19 @@ package test;
 import java.awt.List;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
@@ -22,6 +26,9 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
+
+import word2vec.LoadModel;
+import word2vec.WordEntry;
 
 
 public class SearcherWithWord2Vec {
@@ -161,7 +168,7 @@ public class SearcherWithWord2Vec {
 	/*
 	 * 加入word2vec后的权重计算方法
 	 */
-	public ScoreDoc[] searchWithWord2Vec(String queryString, int maxnum) {
+	public ScoreDoc[] searchWithWord2Vec(String queryString, int maxnum) throws IOException {
 		TopDocs results = searchQueryFields(queryString, maxnum);
 		ScoreDoc[] docs = results.scoreDocs;
 		ArrayList<ScoreDoc> mydocs = new ArrayList<ScoreDoc>();
@@ -174,31 +181,60 @@ public class SearcherWithWord2Vec {
 			}
 		}
 		
-		
+		StringReader reader = new StringReader(queryString);  
+	    TokenStream ts = analyzer.tokenStream("", reader);  
+	    CharTermAttribute term = ts.getAttribute(CharTermAttribute.class); 
+	    ArrayList<String> splits = new ArrayList<String>();
+		while(ts.incrementToken()){  
+			splits.add(term.toString()); 
+		}
+		LoadModel model = LoadModel.getInstance();
+		int size = splits.size(); //切分之后词的数量
+		for (int i = 0; i < size; i++) {
+			Set<WordEntry> simTerm = model.distance(splits.get(i));
+			System.out.println(splits.get(i)+":"+simTerm.toString());
+			for (WordEntry item: simTerm) {
+				TopDocs simResult = this.searchQueryFields(item.name, maxnum);
+				ScoreDoc[] tmpdoc = simResult.scoreDocs;
+				for (int k = 0; k < tmpdoc.length; k++) {
+					tmpdoc[k].score /= size * Math.exp(10*(1-item.score)); //调整参数就靠这句了
+					int index = this.searchScoreDoc(mydocs, tmpdoc[k].doc);
+					if (index == -1) { //还不存在当前文档记录时创建一个
+						mydocs.add(tmpdoc[k]);
+					} else { //否则在当前权重上叠加
+						mydocs.get(index).score += tmpdoc[k].score;
+					}
+				}			
+			}
+		}
 		Collections.sort(mydocs, new Comparator<ScoreDoc>() {
 		    public int compare(ScoreDoc s1, ScoreDoc s2) {
-		    	if (s2.score >= s1.score) {
+		    	if (s2.score > s1.score) {
 		    		return 1;
 		    	} else {
-		    		return -1;
+		    		if (s2.score < s1.score) {
+		    			return -1;
+		    		} else {
+		    			return 0;
+		    		}
 		    	}
 		    }
 		}); 
-		int size = Math.min(maxnum, mydocs.size()); //至多取maxnum个输出
-		docs = new ScoreDoc [size];
-		for (int i = 0; i < size; i++) {
+		int sizes = Math.min(maxnum, mydocs.size()); //至多取maxnum个输出
+		docs = new ScoreDoc [sizes];
+		for (int i = 0; i < sizes; i++) {
 			docs[i] = mydocs.get(i);
 		}
 		return docs;
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 		SearcherWithWord2Vec search=new SearcherWithWord2Vec(
 				SearcherWithWord2Vec.pathIndex[indexPath]);	//找到对应方法的路径
 		/*
 		 * query:江泽民，非常好地诠释CJK存在一定问题的例子
 		 */
-		System.out.println("query:工业");
+		System.out.println("query:药学");
 		//TopDocs results=search.searchQueryOneField("2012", "年", 100);
 		TopDocs results;
 		if (searchState == -1) {
@@ -211,7 +247,7 @@ public class SearcherWithWord2Vec {
 						"score:"+hits[i].score);
 			}
 		} else {
-			ScoreDoc[] hits = search.searchWithWord2Vec("工业", 1000);
+			ScoreDoc[] hits = search.searchWithWord2Vec("药学", 1000);
 			System.out.println("the result number:"+hits.length);
 			for (int i = 0; i < Math.min(hits.length, 100); i++) { // output raw format
 				Document doc = search.getDoc(hits[i].doc);
