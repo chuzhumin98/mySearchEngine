@@ -2,19 +2,28 @@ package test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
+import org.apache.lucene.search.highlight.QueryScorer;
+import org.apache.lucene.search.highlight.SimpleFragmenter;
+import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
@@ -212,9 +221,101 @@ public class TestIndexSearcher extends superSearcher {
 		}	 
 	}
 	
+	/*
+	 * 高亮结果
+	 */
+	public void hightLight(String query) { 
+        QueryParser queryParser = new QueryParser(Version.LUCENE_35,"bookName", analyzer);  
+        Query myQuery = null;
+		try {
+			myQuery = queryParser.parse(query);
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}  
+          
+        SimpleHTMLFormatter simpleHTMLFormatter = new SimpleHTMLFormatter("<font color='red'>", "</font>");      
+        Highlighter highlighter = new Highlighter(simpleHTMLFormatter,new QueryScorer(myQuery));  
+        highlighter.setTextFragmenter(new SimpleFragmenter(1024));   
+        for(int i = 0; i < hits.length; i++){  
+        	System.out.println("top "+(i+1));
+            Document doc = null;
+			try {
+				doc = searcher.doc(hits[i].doc);
+			} catch (CorruptIndexException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}  
+			for (int j = 0; j < this.myfieldsName.length; j++) {
+				String text = doc.get(this.myfieldsName[j]);  
+	              
+	            TokenStream tokenStream = analyzer.tokenStream(text,new StringReader(text));     
+	            String highLightText = null;
+				try {
+					highLightText = highlighter.getBestFragment(tokenStream, text);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvalidTokenOffsetsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}  
+	            if (highLightText == null) {
+	            	highLightText = text;
+	            }
+	            System.out.println(this.myfieldsName[j]+":"+highLightText);  
+			}
+            
+        }   
+	}
+	
+	/*
+	 * 高亮某一个字符串
+	 */
+	public String hightLightString(String query, String text) { 
+		QueryParser queryParser;
+		if (this.searchState == -1) {
+			queryParser = new QueryParser(Version.LUCENE_35, "total", analyzer);
+		} else {
+			queryParser = new org.apache.lucene.queryParser.MultiFieldQueryParser
+					(Version.LUCENE_35, myfieldsName, analyzer, fieldBoosts);	
+		}
+           
+        Query myQuery = null;
+		try {
+			myQuery = queryParser.parse(query);
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}  
+          
+        SimpleHTMLFormatter simpleHTMLFormatter = new SimpleHTMLFormatter("<font color='red'>", "</font>");      
+        Highlighter highlighter = new Highlighter(simpleHTMLFormatter,new QueryScorer(myQuery));  
+        highlighter.setTextFragmenter(new SimpleFragmenter(1024));   
+        TokenStream tokenStream = analyzer.tokenStream(text,new StringReader(text));     
+        String highLightText = null;
+		try {
+			highLightText = highlighter.getBestFragment(tokenStream, text);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidTokenOffsetsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+        if (highLightText == null) {
+        	highLightText = text;
+        }   
+        return highLightText;
+	}
+	
 	public static void main(String[] args){
 		TestIndexSearcher search=new TestIndexSearcher(
 				TestIndexSearcher.pathIndex[2]);	//找到对应方法的路径
 		search.getSearch(0, 2, "江泽民");
+		search.hightLight("江泽民");
 	}
 }

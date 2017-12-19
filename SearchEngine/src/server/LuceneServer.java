@@ -46,7 +46,8 @@ public class LuceneServer extends HttpServlet{
 		String queryString = request.getParameter("query"); //query 信息
 		String pageString = request.getParameter("page"); //页编号信息
 		
-		int searchMethod = 2; //通过前端过来的数据分析出方法
+		int searchMethod = 1; //通过前端过来的数据分析出方法
+		System.out.println("searchMethod:"+searchMethod);
 		String[] fields = IndexTable.getFields(searchMethod);
 		
 		int page = 1;
@@ -69,7 +70,9 @@ public class LuceneServer extends HttpServlet{
 						String[] fieldResult = new String [docNum];
 						for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
 							Document doc = IndexTable.myEngine[searchMethod].getDoc(hits[i].doc);
-							fieldResult[i] = doc.get(fields[k]);
+							//输出高亮之后的文本
+							fieldResult[i] = IndexTable.myEngine
+									[searchMethod].hightLightString(queryString, doc.get(fields[k]));
 						}
 						jsonTotal.put(fields[k], fieldResult);
 					}	

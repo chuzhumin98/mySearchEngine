@@ -12,4 +12,8 @@ public class superSearcher {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public String hightLightString(String query, String text) {
+		return text;
+	}
 }
