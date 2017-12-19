@@ -61,7 +61,7 @@ System.out.println(basePath);
 <nav class="navbar navbar-default" role="navigation" style="height:81px;border-style:none">
     <div class="container-fluid"> 
         <form class="navbar-form navbar-left" role="search">
-        	<img src=<%=path+"/images/tsinghuas7.png" %>  alt="Tsinghua Search" width="165" height="55" class="img-rounded"/>
+        	<img src=<%=path+"/images/cnki2.jpg" %>  alt="Cnki Search" width="50" height="50" class="img-rounded"/>
             <input style="width:570px;height:30px" type="text" class="form-control" id="searchInput" placeholder="input something..." name="query" value="<%=currentQuery %>">
             <button style="height:30px;width:60px" class="btn btn-success" type="submit">搜索</button>
         </form>

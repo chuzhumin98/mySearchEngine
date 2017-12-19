@@ -38,6 +38,7 @@ System.out.println(basePath);
 -->
 </style>
 </head>
+<div align="center" style="padding-top:100px; padding-bottom:50px;"> <img src= "images/cnki1.png" alt="Cnki search" width="240" height="150"/></div>
     <form class="form-horizontal" id="form1" name="form1" method="get" action="servlet/LuceneServer">
 	  <div class="form-group">
 	    <div class="col-sm-offset-3 col-sm-6">
