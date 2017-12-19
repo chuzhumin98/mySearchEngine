@@ -27,27 +27,29 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import server.superSearcher;
 import word2vec.LoadModel;
 import word2vec.WordEntry;
 
 
-public class SearcherWithWord2Vec {
+public class SearcherWithWord2Vec extends superSearcher {
 	private IndexReader reader;
 	private IndexSearcher searcher;
 	private Analyzer analyzer;
 	public static int searchState = 0;
 	public static int indexPath = 0;
-	public static float[] boostsValue = {8, 10, 1, 2};
+	public float[] boostsValue = {8, 10, 1, 2};
 	public static String[] pathIndex = {"index/simpleIKanalyzer"}; //对应的index的位置 
 	private Map<String, Float> fieldBoosts;
 	public static String[] fieldsName = {"题名", "作者", "摘要", "年"};
 	public static String[] fieldsNameEnglish = {"英文篇名", "英文作者", "英文摘要", "年"};
-	public static String[] myfieldsName = fieldsName; //指向现在需要使用的域的引用
+	public String[] myfieldsName = fieldsName; //指向现在需要使用的域的引用
+	
 	
 	/*
 	 * 获取
 	 */
-	public static void getFieldsName() {
+	public void getFieldsName() {
 		switch (searchState) {
 		case 0:
 			myfieldsName = fieldsName;
@@ -141,7 +143,7 @@ public class SearcherWithWord2Vec {
 		return null;
 	}
 	
-	private static String toDocString(Document doc) {
+	private String toDocString(Document doc) {
 		String strings = "";
 		getFieldsName();
 		for (int i = 0; i < myfieldsName.length; i++) {
@@ -228,32 +230,45 @@ public class SearcherWithWord2Vec {
 		return docs;
 	}
 	
-	public static void main(String[] args) throws IOException{
-		SearcherWithWord2Vec search=new SearcherWithWord2Vec(
-				SearcherWithWord2Vec.pathIndex[indexPath]);	//找到对应方法的路径
+	/*
+	 * (non-Javadoc)
+	 * @see server.superSearcher#getSearch(int, int, java.lang.String)
+	 */
+	public void getSearch(int searchState, int analyzerMethod, String query) {
 		/*
 		 * query:江泽民，非常好地诠释CJK存在一定问题的例子
 		 */
-		System.out.println("query:药学");
+		System.out.println("query:"+query);
 		//TopDocs results=search.searchQueryOneField("2012", "年", 100);
 		TopDocs results;
 		if (searchState == -1) {
-			results = search.searchQueryTotal("application", 1000);
-			ScoreDoc[] hits = results.scoreDocs;
+			results = this.searchQueryTotal(query, 1000);
+			hits = results.scoreDocs;
 			System.out.println("the result number:"+hits.length);
 			for (int i = 0; i < Math.min(hits.length, 20); i++) { // output raw format
-				Document doc = search.getDoc(hits[i].doc);
+				Document doc = this.getDoc(hits[i].doc);
 				System.out.println("top "+ (i+1) + ":\n"+doc.get("total")+
 						"score:"+hits[i].score);
 			}
 		} else {
-			ScoreDoc[] hits = search.searchWithWord2Vec("药学", 1000);
+			try {
+				hits = this.searchWithWord2Vec(query, 1000);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			System.out.println("the result number:"+hits.length);
 			for (int i = 0; i < Math.min(hits.length, 100); i++) { // output raw format
-				Document doc = search.getDoc(hits[i].doc);
-				System.out.println("top "+ (i+1) + ":\n"+toDocString(doc)+
+				Document doc = this.getDoc(hits[i].doc);
+				System.out.println("top "+ (i+1) + ":\n"+this.toDocString(doc)+
 						"score:"+hits[i].score);
 			}
-		}	 
+		}	
+	}
+	
+	public static void main(String[] args) throws IOException{
+		SearcherWithWord2Vec search=new SearcherWithWord2Vec(
+				SearcherWithWord2Vec.pathIndex[indexPath]);	//找到对应方法的路径
+		search.getSearch(0, 0, "药学");
 	}
 }

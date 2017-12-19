@@ -19,26 +19,30 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import server.superSearcher;
 
-public class TestIndexSearcher {
+
+public class TestIndexSearcher extends superSearcher {
 	private IndexReader reader;
 	private IndexSearcher searcher;
 	private Analyzer analyzer;
-	public static int analyzerMethod = 4;
-	public static int searchState = -1;
-	public static int indexPath = 5; //对应的index的位置
-	public static float[] boostsValue = {8, 10, 1, 2};
-	public static String[] pathIndex = {"index/simpleIKanalyzer",
-			"index/simpleStandardAnalyzer", "index/simpleCJKAnalyzer",
-			"index/simplePaodingAnalyzer", "index/simpleStandardAnalyzerEnglish",
-			"index/simpleToy"}; //对应的index的位置 
+	public int analyzerMethod = 1;
+	public int searchState = 0; //中文还是英文域
+	public float[] boostsValue = {8, 10, 1, 2};
+	public static String[] pathIndex = {"D:/workspace/SearchEngine/index/simpleIKanalyzer",
+			"D:/workspace/SearchEngine/index/simpleStandardAnalyzer",
+			"D:/workspace/SearchEngine/index/simpleCJKAnalyzer",
+			"D:/workspace/SearchEngine/index/simplePaodingAnalyzer", 
+			"D:/workspace/SearchEngine/index/simpleStandardAnalyzerEnglish",
+			"D:/workspace/SearchEngine/index/simpleToy"}; //对应的index的位置 
 	private Map<String, Float> fieldBoosts;
 	public static String[] myfieldsName; //指向现在需要使用的域的引用
+	
 	
 	/*
 	 * 获取
 	 */
-	public static void getFieldsName() {
+	public void getFieldsName() {
 		switch (searchState) {
 		case 0:
 			myfieldsName = TestIndexWriter.fieldsName;
@@ -54,7 +58,7 @@ public class TestIndexSearcher {
 	/*
 	 * 获取对应的分词器
 	 */
-	private static Analyzer getAnalyzer() {
+	private Analyzer getAnalyzer() {
 		Analyzer tmp = null;
 		if (searchState == -1) {
 			tmp = new IKAnalyzer();
@@ -99,6 +103,15 @@ public class TestIndexSearcher {
 			}
 		}catch(IOException e){
 			e.printStackTrace();
+		}
+	}
+	
+	public void initSearcher() {
+		analyzer = this.getAnalyzer();
+		getFieldsName();
+		fieldBoosts = new HashMap<String, Float>();
+		for (int i = 0; i < myfieldsName.length; i++) {
+			fieldBoosts.put(myfieldsName[i], boostsValue[i]);
 		}
 	}
 	
@@ -155,7 +168,7 @@ public class TestIndexSearcher {
 		return null;
 	}
 	
-	private static String toDocString(Document doc) {
+	private String toDocString(Document doc) {
 		String strings = "";
 		getFieldsName();
 		for (int i = 0; i < myfieldsName.length; i++) {
@@ -165,33 +178,43 @@ public class TestIndexSearcher {
 		return strings;
 	}
 	
-	public static void main(String[] args){
-		TestIndexSearcher search=new TestIndexSearcher(
-				TestIndexSearcher.pathIndex[indexPath]);	//找到对应方法的路径
+	/*
+	 * 整合的方法
+	 */
+	public void getSearch(int searchState, int analyzerMethod, String query) {
+		this.searchState = searchState;
+		this.analyzerMethod = analyzerMethod;
+		this.initSearcher();
 		/*
 		 * query:江泽民，非常好地诠释CJK存在一定问题的例子
 		 */
-		System.out.println("query:Application");
+		System.out.println("query:"+query);
 		//TopDocs results=search.searchQueryOneField("2012", "年", 100);
 		TopDocs results;
-		if (searchState == -1) {
-			results = search.searchQueryTotal("application", 1000);
-			ScoreDoc[] hits = results.scoreDocs;
+		if (this.searchState == -1) {
+			results = this.searchQueryTotal(query, 1000);
+			hits = results.scoreDocs;
 			System.out.println("the result number:"+hits.length);
 			for (int i = 0; i < Math.min(hits.length, 20); i++) { // output raw format
-				Document doc = search.getDoc(hits[i].doc);
+				Document doc = this.getDoc(hits[i].doc);
 				System.out.println("top "+ (i+1) + ":\n"+doc.get("total")+
 						"score:"+hits[i].score);
 			}
 		} else {
-			results = search.searchQueryFields("application", 1000);
-			ScoreDoc[] hits = results.scoreDocs;
+			results = this.searchQueryFields(query, 1000);
+			hits = results.scoreDocs;
 			System.out.println("the result number:"+hits.length);
 			for (int i = 0; i < Math.min(hits.length, 100); i++) { // output raw format
-				Document doc = search.getDoc(hits[i].doc);
-				System.out.println("top "+ (i+1) + ":\n"+toDocString(doc)+
+				Document doc = this.getDoc(hits[i].doc);
+				System.out.println("top "+ (i+1) + ":\n"+this.toDocString(doc)+
 						"score:"+hits[i].score);
 			}
 		}	 
+	}
+	
+	public static void main(String[] args){
+		TestIndexSearcher search=new TestIndexSearcher(
+				TestIndexSearcher.pathIndex[2]);	//找到对应方法的路径
+		search.getSearch(0, 2, "江泽民");
 	}
 }

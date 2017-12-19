@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="lib/Lucene/IKAnalyzer3.2.5Stable.jar"/>
-	<classpathentry kind="lib" path="lib/Lucene/lucene-analyzers-3.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/Lucene/lucene-core-3.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/Lucene/THULAC_lite_java_run.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.8.0_111">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v8.0">
+		<attributes>
+			<attribute name="owner.project.facets" value="jst.web"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="lib/json/commons-beanutils-1.8.0.jar"/>
 	<classpathentry kind="lib" path="lib/json/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/json/commons-lang-2.5.jar"/>
 	<classpathentry kind="lib" path="lib/json/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/json/ezmorph-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/json/json-lib-2.4-jdk15.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="lib/Lucene/IKAnalyzer3.2.5Stable.jar"/>
+	<classpathentry kind="lib" path="lib/Lucene/lucene-analyzers-3.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/Lucene/lucene-core-3.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/Lucene/THULAC_lite_java_run.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
 </classpath>
