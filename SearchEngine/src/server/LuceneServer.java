@@ -11,19 +11,15 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.ScoreDoc;
 
 import net.sf.json.JSONObject;
+import server.IndexTable;
 
 
 
-
-
-@SuppressWarnings("serial")
 public class LuceneServer extends HttpServlet{
 	public static final int PAGE_RESULT=10;
-	public static final String indexDir="forIndex";
-	public static final String picDir="";
 	public LuceneServer(){
 		super();
-
+		System.out.println("hello for visit me!");
 	}
 	
 	/*
@@ -68,13 +64,14 @@ public class LuceneServer extends HttpServlet{
 			if (allResult != null) {
 				ScoreDoc[] hits = showList(allResult, page);
 				if (hits != null) {
+					int docNum = Math.min(PAGE_RESULT, hits.length);
 					for (int k = 0; k < fields.length; k++) {
-						String string = "";
+						String[] fieldResult = new String [docNum];
 						for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
 							Document doc = IndexTable.myEngine[searchMethod].getDoc(hits[i].doc);
-							string = doc.get(fields[k]);
+							fieldResult[i] = doc.get(fields[k]);
 						}
-						jsonTotal.put(fields[k], string);
+						jsonTotal.put(fields[k], fieldResult);
 					}	
 				} else {
 					System.out.println("page null");
@@ -83,12 +80,12 @@ public class LuceneServer extends HttpServlet{
 				System.out.println("result null");
 			}
 			System.out.println("json:"+jsonTotal.toString());
+			
 			request.setAttribute("currentQuery",queryString);
 			request.setAttribute("currentPage", page);
-			for (int k = 0; k < fields.length; k++) {
-				request.setAttribute(fields[k], jsonTotal.get(fields[k]));
-			}
-			request.getRequestDispatcher("/imageshow.jsp").forward(request,
+			request.setAttribute("searchMethod", searchMethod);
+			request.setAttribute("results", jsonTotal);
+			request.getRequestDispatcher("/resultShow.jsp").forward(request,
 					response);
 		}
 	}

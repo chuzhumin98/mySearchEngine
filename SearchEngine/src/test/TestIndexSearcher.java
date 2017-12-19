@@ -29,10 +29,12 @@ public class TestIndexSearcher extends superSearcher {
 	public int analyzerMethod = 1;
 	public int searchState = 0; //中文还是英文域
 	public float[] boostsValue = {8, 10, 1, 2};
-	public static String[] pathIndex = {"index/simpleIKanalyzer",
-			"index/simpleStandardAnalyzer", "index/simpleCJKAnalyzer",
-			"index/simplePaodingAnalyzer", "index/simpleStandardAnalyzerEnglish",
-			"index/simpleToy"}; //对应的index的位置 
+	public static String[] pathIndex = {"D:/workspace/SearchEngine/index/simpleIKanalyzer",
+			"D:/workspace/SearchEngine/index/simpleStandardAnalyzer",
+			"D:/workspace/SearchEngine/index/simpleCJKAnalyzer",
+			"D:/workspace/SearchEngine/index/simplePaodingAnalyzer", 
+			"D:/workspace/SearchEngine/index/simpleStandardAnalyzerEnglish",
+			"D:/workspace/SearchEngine/index/simpleToy"}; //对应的index的位置 
 	private Map<String, Float> fieldBoosts;
 	public static String[] myfieldsName; //指向现在需要使用的域的引用
 	
@@ -107,6 +109,7 @@ public class TestIndexSearcher extends superSearcher {
 	public void initSearcher() {
 		analyzer = this.getAnalyzer();
 		getFieldsName();
+		fieldBoosts = new HashMap<String, Float>();
 		for (int i = 0; i < myfieldsName.length; i++) {
 			fieldBoosts.put(myfieldsName[i], boostsValue[i]);
 		}

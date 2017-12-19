@@ -35,10 +35,12 @@ public class TestIndexWriter {
 	public static String[] myfieldsName; //指向现在需要使用的域的引用
 	static IndexWriter writer;
 	static Analyzer analyzer;
-	public static String[] pathIndex = {"index/simpleIKanalyzer",
-			"index/simpleStandardAnalyzer", "index/simpleCJKAnalyzer",
-			"index/simplePaodingAnalyzer", "index/simpleStandardAnalyzerEnglish",
-			"index/simpleToy"}; //对应的index的位置 
+	public static String[] pathIndex = {"D:/workspace/SearchEngine/index/simpleIKanalyzer",
+			"D:/workspace/SearchEngine/index/simpleStandardAnalyzer",
+			"D:/workspace/SearchEngine/index/simpleCJKAnalyzer",
+			"D:/workspace/SearchEngine/index/simplePaodingAnalyzer", 
+			"D:/workspace/SearchEngine/index/simpleStandardAnalyzerEnglish",
+			"D:/workspace/SearchEngine/index/simpleToy"}; //对应的index的位置 
 	
 	/*
 	 * 获取对应的分词器
