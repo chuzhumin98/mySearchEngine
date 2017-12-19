@@ -17,6 +17,8 @@ import server.IndexTable;
 
 public class LuceneServer extends HttpServlet{
 	public static final int PAGE_RESULT=10;
+	int searchMethod = 0; //通过前端过来的数据分析出方法
+	String predQuery = "";
 	public LuceneServer(){
 		super();
 		System.out.println("hello for visit me!");
@@ -46,7 +48,10 @@ public class LuceneServer extends HttpServlet{
 		String queryString = request.getParameter("query"); //query 信息
 		String pageString = request.getParameter("page"); //页编号信息
 		
-		int searchMethod = 1; //通过前端过来的数据分析出方法
+		if (!queryString.equals(predQuery)) {
+			searchMethod = (searchMethod+1)%6; //改变查询时更换方法
+			this.predQuery = queryString;
+		}
 		System.out.println("searchMethod:"+searchMethod);
 		String[] fields = IndexTable.getFields(searchMethod);
 		

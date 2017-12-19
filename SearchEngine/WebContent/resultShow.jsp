@@ -1,6 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 <%@ page import= "net.sf.json.JSONObject" %>
 <%@ page import= "net.sf.json.JSONArray" %>
+<%@ page import= "server.IndexTable" %>
 <%
 request.setCharacterEncoding("utf-8");
 response.setCharacterEncoding("utf-8");
@@ -89,25 +90,42 @@ function myCheck()
 </div>
 
 <%  	
+	int searchMethod = (Integer) request.getAttribute("searchMethod");
+	String[] fields = IndexTable.getFields(searchMethod);
+	int fieldNum = fields.length;
 	JSONObject results = JSONObject.fromObject(request.getAttribute("results"));	
-	JSONArray titles = results.getJSONArray("题名");
-	JSONArray authors = results.getJSONArray("作者");
-	JSONArray abstracts = results.getJSONArray("摘要");
-	JSONArray years = results.getJSONArray("年");
+	JSONArray[] myResults = new JSONArray [fieldNum];
+	for (int i = 0; i < fieldNum; i++) {
+		if (results.containsKey(fields[i])) {
+			myResults[i] = results.getJSONArray(fields[i]);
+		} else {
+			myResults[i] = new JSONArray();
+		}
+		
+	}
 	int resultNum = (Integer) request.getAttribute("resultNum");
+	
 %>
 <div id="Layer2" style="top: 120px; height: 900px; left:185px">
   <div id="imagediv">共搜到<%= resultNum %>条结果：
   <br/></br/>
   <Table style="left: 0px; width: 594px;">
   <%
-  for (int i = 0; i < titles.size(); i++) {
+  for (int i = 0; i < myResults[0].size(); i++) {
   %>
   <p># <%= currentPage*10+i-9 %> </p>
-  <p>题名：<%= titles.getString(i) %> </p>
-  <p>作者：<%= authors.getString(i) %> </p>
-  <p>摘要：<%= abstracts.getString(i) %> </p>
-  <p>年：<%= years.getString(i) %> </p>
+  <%if (fieldNum == 1) { %>
+  <%
+  String[] lines = myResults[0].getString(i).split("\n");
+  for (int j = 0; j < lines.length; j++) {
+  %>
+  <p><%= lines[j] %> </p>
+  <%} %>
+  <%} else { %>
+  <%for (int j = 0; j < fieldNum; j++){ %>
+  	<p><%= fields[j] %>:<%= myResults[j].getString(i) %> </p>
+  	<%} %>
+  	<%} %>
   <hr/>
   <%} %>
   </Table>

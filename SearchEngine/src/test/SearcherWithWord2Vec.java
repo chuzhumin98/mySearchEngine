@@ -39,7 +39,7 @@ public class SearcherWithWord2Vec extends superSearcher {
 	public static int searchState = 0;
 	public static int indexPath = 0;
 	public float[] boostsValue = {8, 10, 1, 2};
-	public static String[] pathIndex = {"index/simpleIKanalyzer"}; //对应的index的位置 
+	public static String[] pathIndex = {"D:/workspace/SearchEngine/index/simpleIKanalyzer"}; //对应的index的位置 
 	private Map<String, Float> fieldBoosts;
 	public static String[] fieldsName = {"题名", "作者", "摘要", "年"};
 	public static String[] fieldsNameEnglish = {"英文篇名", "英文作者", "英文摘要", "年"};

@@ -27,7 +27,7 @@ public class LoadModel {
     		try {
 				//model.loadJavaModelTxt("word2vec/Skipgram_data");
     			//model.loadModelBin("word2vec/smallmodel.bin");
-    			model.loadModelBin("word2vec/bigmodel.bin");
+    			model.loadModelBin("D:/workspace/SearchEngine/word2vec/bigmodel.bin");
 				System.out.println("succeed load skip-gram model!");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
