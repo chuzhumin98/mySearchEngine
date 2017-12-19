@@ -1,3 +1,6 @@
 # ignore these types of file
 TestLucene/index
 TestLucene/import
+SearchEngine/index
+SearchEngine/import
+SearchEngine/word2vec
