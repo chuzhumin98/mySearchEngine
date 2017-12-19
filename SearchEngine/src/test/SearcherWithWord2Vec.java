@@ -245,7 +245,7 @@ public class SearcherWithWord2Vec extends superSearcher {
 			results = this.searchQueryTotal(query, 1000);
 			hits = results.scoreDocs;
 			System.out.println("the result number:"+hits.length);
-			for (int i = 0; i < Math.min(hits.length, 20); i++) { // output raw format
+			for (int i = 0; i < Math.min(hits.length, 5); i++) { // output raw format
 				Document doc = this.getDoc(hits[i].doc);
 				System.out.println("top "+ (i+1) + ":\n"+doc.get("total")+
 						"score:"+hits[i].score);
@@ -258,7 +258,7 @@ public class SearcherWithWord2Vec extends superSearcher {
 				e.printStackTrace();
 			}
 			System.out.println("the result number:"+hits.length);
-			for (int i = 0; i < Math.min(hits.length, 100); i++) { // output raw format
+			for (int i = 0; i < Math.min(hits.length, 10); i++) { // output raw format
 				Document doc = this.getDoc(hits[i].doc);
 				System.out.println("top "+ (i+1) + ":\n"+this.toDocString(doc)+
 						"score:"+hits[i].score);

@@ -146,8 +146,9 @@ function myCheck()
 		<strong> <%=currentPage%></strong>
 		<%for (int i=currentPage+1;i<=Math.min(currentPage+5,(resultNum+9)/10);i++){ %>
 			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
-		<%}; %>
-		<%if(currentPage*10 >= resultNum){%> 下一页<%}else { %><a href="LuceneServer?query=<%=currentQuery%>&page=<%=currentPage+1%>"> 下一页</a>
+		<%} %>
+		<%if(currentPage*10 >= resultNum){%> 下一页<%}else { %>
+		<a href="LuceneServer?query=<%=currentQuery%>&page=<%=currentPage+1%>"> 下一页</a>
 		<%} %>
 		</font>
 	</p>
