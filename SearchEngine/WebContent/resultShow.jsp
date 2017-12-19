@@ -32,7 +32,7 @@ System.out.println(basePath);
 }
 #Layer2 {
 	position:absolute;
-	left:29px;
+	left:10px;
 	top:82px;
 	width:648px;
 	height:602px;
@@ -40,7 +40,7 @@ System.out.println(basePath);
 }
 #Layer3 {
 	position:absolute;
-	left:28px;
+	left:10px;
 	top:697px;
 	width:652px;
 	height:67px;
@@ -55,9 +55,27 @@ System.out.println(basePath);
 	String currentQuery=(String) request.getAttribute("currentQuery");
 	int currentPage=(Integer) request.getAttribute("currentPage");
 %>
+
+<script type="text/javascript">  
+function myCheck()  
+{  
+   for(var i=0;i<document.form1.elements.length-1;i++)  
+   {  
+      if(document.form1.elements[i].value=="")  
+      {  
+         alert("当前表单不能有空项");  
+         document.form1.elements[i].focus();  
+         return false;  
+      }  
+   }  
+   return true;  
+    
+}  
+</script>  
+
 <nav class="navbar navbar-default" role="navigation" style="height:55px;border-style:none"></nav>
 <div id="Layer1">
-<form class="form-inline" id="form1" name="form1" method="get" action="LuceneServer">
+<form class="form-inline" id="form1" name="form1" method="get" action="LuceneServer" onSubmit="return myCheck()">
 <nav class="navbar navbar-default" role="navigation" style="height:81px;border-style:none">
     <div class="container-fluid"> 
         <form class="navbar-form navbar-left" role="search">
@@ -76,15 +94,16 @@ System.out.println(basePath);
 	JSONArray authors = results.getJSONArray("作者");
 	JSONArray abstracts = results.getJSONArray("摘要");
 	JSONArray years = results.getJSONArray("年");
+	int resultNum = (Integer) request.getAttribute("resultNum");
 %>
 <div id="Layer2" style="top: 120px; height: 900px; left:185px">
-  <div id="imagediv">共搜到<%= 10 %>条结果：
-  <br>
+  <div id="imagediv">共搜到<%= resultNum %>条结果：
+  <br/></br/>
   <Table style="left: 0px; width: 594px;">
   <%
   for (int i = 0; i < titles.size(); i++) {
   %>
-  <p>result <%= i+1 %> </p>
+  <p># <%= currentPage*10+i-9 %> </p>
   <p>题名：<%= titles.getString(i) %> </p>
   <p>作者：<%= authors.getString(i) %> </p>
   <p>摘要：<%= abstracts.getString(i) %> </p>
@@ -103,6 +122,15 @@ System.out.println(basePath);
 			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=currentPage-1%>"> 上一页</a>
 		<%}else{ %>
 		 上一页<%}; %>
+		 <%for (int i=Math.max(1,currentPage-5);i<currentPage;i++){%>
+			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
+		<%}; %>
+		<strong> <%=currentPage%></strong>
+		<%for (int i=currentPage+1;i<=Math.min(currentPage+5,(resultNum+9)/10);i++){ %>
+			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
+		<%}; %>
+		<%if(currentPage*10 >= resultNum){%> 下一页<%}else { %><a href="LuceneServer?query=<%=currentQuery%>&page=<%=currentPage+1%>"> 下一页</a>
+		<%} %>
 		</font>
 	</p>
   </div>

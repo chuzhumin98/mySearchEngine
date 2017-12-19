@@ -81,6 +81,7 @@ public class LuceneServer extends HttpServlet{
 			}
 			System.out.println("json:"+jsonTotal.toString());
 			
+			request.setAttribute("resultNum", allResult.length);
 			request.setAttribute("currentQuery",queryString);
 			request.setAttribute("currentPage", page);
 			request.setAttribute("searchMethod", searchMethod);
