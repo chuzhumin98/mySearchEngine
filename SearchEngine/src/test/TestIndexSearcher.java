@@ -28,7 +28,6 @@ public class TestIndexSearcher extends superSearcher {
 	private Analyzer analyzer;
 	public int analyzerMethod = 1;
 	public int searchState = 0; //中文还是英文域
-	public static int indexPath = 1; //对应的index的位置
 	public float[] boostsValue = {8, 10, 1, 2};
 	public static String[] pathIndex = {"index/simpleIKanalyzer",
 			"index/simpleStandardAnalyzer", "index/simpleCJKAnalyzer",
@@ -105,6 +104,14 @@ public class TestIndexSearcher extends superSearcher {
 		}
 	}
 	
+	public void initSearcher() {
+		analyzer = this.getAnalyzer();
+		getFieldsName();
+		for (int i = 0; i < myfieldsName.length; i++) {
+			fieldBoosts.put(myfieldsName[i], boostsValue[i]);
+		}
+	}
+	
 	/*
 	 * 在某个特定域中搜索结果
 	 */
@@ -174,6 +181,7 @@ public class TestIndexSearcher extends superSearcher {
 	public void getSearch(int searchState, int analyzerMethod, String query) {
 		this.searchState = searchState;
 		this.analyzerMethod = analyzerMethod;
+		this.initSearcher();
 		/*
 		 * query:江泽民，非常好地诠释CJK存在一定问题的例子
 		 */
@@ -203,7 +211,7 @@ public class TestIndexSearcher extends superSearcher {
 	
 	public static void main(String[] args){
 		TestIndexSearcher search=new TestIndexSearcher(
-				TestIndexSearcher.pathIndex[1]);	//找到对应方法的路径
-		search.getSearch(0, 1, "江泽民");
+				TestIndexSearcher.pathIndex[2]);	//找到对应方法的路径
+		search.getSearch(0, 2, "江泽民");
 	}
 }

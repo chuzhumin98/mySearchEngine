@@ -96,6 +96,7 @@ public class IndexTable {
 	public ScoreDoc[] getSearchResult(int method, String query) {
 		IndexTable mytable = IndexTable.getInstance();
 		JSONObject json1 = mytable.tables.get(method);
+		//System.out.println(json1.toString());
 		if (IndexTable.myEngine[method] == null) {
 			//System.out.println("is null");
 			int indexPath = json1.getInt("indexPath");
@@ -131,6 +132,6 @@ public class IndexTable {
 	
 	public static void main(String[] args) {
 		IndexTable table = IndexTable.getInstance();
-		table.getSearchResult(5, "Jiang Zemin");
+		table.getSearchResult(4, "江泽民");
 	}
 }
