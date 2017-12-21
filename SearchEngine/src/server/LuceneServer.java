@@ -48,15 +48,15 @@ public class LuceneServer extends HttpServlet{
 		String queryString = request.getParameter("query"); //query 信息
 		String pageString = request.getParameter("page"); //页编号信息
 		
-		if (!queryString.equals(predQuery)) {
-			searchMethod = (searchMethod+1)%6; //改变查询时更换方法
+		if (queryString == null || !queryString.equals(predQuery)) {
+			searchMethod = (searchMethod+1)%7; //改变查询时更换方法
 			this.predQuery = queryString;
 		}
 		System.out.println("searchMethod:"+searchMethod);
 		String[] fields = IndexTable.getFields(searchMethod);
 		
 		int page = 1;
-		if(pageString!=null){
+		if(pageString != null){
 			page = Integer.parseInt(pageString);
 		}
 		if(queryString == null){

@@ -28,6 +28,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import com.chenlb.mmseg4j.analysis.ComplexAnalyzer;
+
 import server.superSearcher;
 
 
@@ -41,7 +43,7 @@ public class TestIndexSearcher extends superSearcher {
 	public static String[] pathIndex = {"D:/workspace/SearchEngine/index/simpleIKanalyzer",
 			"D:/workspace/SearchEngine/index/simpleStandardAnalyzer",
 			"D:/workspace/SearchEngine/index/simpleCJKAnalyzer",
-			"D:/workspace/SearchEngine/index/simplePaodingAnalyzer", 
+			"D:/workspace/SearchEngine/index/simpleComplexAnalyzer", 
 			"D:/workspace/SearchEngine/index/simpleStandardAnalyzerEnglish",
 			"D:/workspace/SearchEngine/index/simpleToy"}; //对应的index的位置 
 	private Map<String, Float> fieldBoosts;
@@ -84,7 +86,7 @@ public class TestIndexSearcher extends superSearcher {
 	        	tmp = new CJKAnalyzer(Version.LUCENE_35);
 	        	break;
 	        case 3:
-	        	//tmp = new PaodingAnalyzer(); 
+	        	tmp = new ComplexAnalyzer(); 
 	        	break;
 	        default:
 	        	tmp = new IKAnalyzer(); 

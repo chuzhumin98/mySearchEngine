@@ -23,13 +23,18 @@ import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import com.chenlb.mmseg4j.analysis.ComplexAnalyzer;
+
+
 public class TestIndexWriter {
 	public static String[] fieldsName = {"题名", "作者", "摘要", "年"};
 	public static String[] fieldsNameEnglish = {"英文篇名", "英文作者", "英文摘要", "年"};
 	public static String[] fieldsTotal = {"total"};
-	public static int analyzerMethod = 0; //0表示IKAnalyzer,1表示StandardAnalyzer(对中文按字分词),2表示CJKAnalyzer
-	public static int indexState = -1; //-1表示toy搜索，即不区分任何标签，0表示简单中文索引，1表示简单英文索引
-	public static int indexPath = 5; //对应的index的位置
+	public static int analyzerMethod = 3; 
+	//0表示IKAnalyzer,1表示StandardAnalyzer(对中文按字分词),
+	//2表示CJKAnalyzer
+	public static int indexState = 0; //-1表示toy搜索，即不区分任何标签，0表示简单中文索引，1表示简单英文索引
+	public static int indexPath = 3; //对应的index的位置
 	public static boolean[] beAnalyzed = {true, true, true, false};
 	public static float[] boostsValue = {8, 10, 1, 2};
 	public static String[] myfieldsName; //指向现在需要使用的域的引用
@@ -38,7 +43,7 @@ public class TestIndexWriter {
 	public static String[] pathIndex = {"D:/workspace/SearchEngine/index/simpleIKanalyzer",
 			"D:/workspace/SearchEngine/index/simpleStandardAnalyzer",
 			"D:/workspace/SearchEngine/index/simpleCJKAnalyzer",
-			"D:/workspace/SearchEngine/index/simplePaodingAnalyzer", 
+			"D:/workspace/SearchEngine/index/simpleComplexAnalyzer",
 			"D:/workspace/SearchEngine/index/simpleStandardAnalyzerEnglish",
 			"D:/workspace/SearchEngine/index/simpleToy"}; //对应的index的位置 
 	
@@ -62,7 +67,7 @@ public class TestIndexWriter {
 	        	tmp = new CJKAnalyzer(Version.LUCENE_35);
 	        	break;
 	        case 3:
-	        	//tmp = new PaodingAnalyzer(); 
+	        	tmp = new ComplexAnalyzer(); 
 	        	break;
 	        default:
 	        	tmp = new IKAnalyzer(); 

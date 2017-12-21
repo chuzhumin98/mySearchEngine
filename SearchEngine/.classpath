@@ -20,9 +20,10 @@
 	<classpathentry kind="lib" path="lib/json/ezmorph-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/json/json-lib-2.4-jdk15.jar"/>
 	<classpathentry kind="lib" path="lib/Lucene/IKAnalyzer3.2.5Stable.jar"/>
+	<classpathentry kind="lib" path="lib/Lucene/THULAC_lite_java_run.jar"/>
 	<classpathentry kind="lib" path="lib/Lucene/lucene-analyzers-3.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/Lucene/lucene-core-3.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/Lucene/THULAC_lite_java_run.jar"/>
 	<classpathentry kind="lib" path="lib/Lucene/lucene-highlighter-3.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/Lucene/mmseg4j-all-with-dic-1.8.6.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

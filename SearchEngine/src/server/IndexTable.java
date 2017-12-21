@@ -84,6 +84,17 @@ public class IndexTable {
 		json1.put("classType", 0); //0表示TestIndexSearcher,1表示SearcherWithWord2Vec
 		json1.put("analyzerMethod", 0); //表示采用的分词工具类型
 		tables.add(json1);
+		
+		/*
+		 * index:6
+		 * ComplexAnalyzer对于普通中文文本的检索
+		 */
+		json1 = new JSONObject();
+		json1.put("searchState", 0); //决定调用的域类型
+		json1.put("indexPath", 3); //index所存储的位置
+		json1.put("classType", 0); //0表示TestIndexSearcher,1表示SearcherWithWord2Vec
+		json1.put("analyzerMethod", 3); //表示采用的分词工具类型
+		tables.add(json1);
 	}
 	
 	public static IndexTable getInstance() {
@@ -132,6 +143,6 @@ public class IndexTable {
 	
 	public static void main(String[] args) {
 		IndexTable table = IndexTable.getInstance();
-		table.getSearchResult(4, "江泽民");
+		table.getSearchResult(6, "江泽民");
 	}
 }

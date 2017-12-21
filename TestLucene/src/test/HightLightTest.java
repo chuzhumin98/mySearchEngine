@@ -49,7 +49,7 @@ public class HightLightTest {
         IndexSearcher searcher = new IndexSearcher(dir);  
         QueryParser queryParser = new QueryParser(Version.LUCENE_34,"bookName", analyzer);  
         Query query = queryParser.parse(keyWords);  
-        ScoreDoc [] scoreDoc = topDocs.scoreDocs;  
+        ScoreDoc[] scoreDoc = topDocs.scoreDocs;  
           
         SimpleHTMLFormatter simpleHTMLFormatter = new SimpleHTMLFormatter("<font color='red'>", "</font>");      
         Highlighter highlighter = new Highlighter(simpleHTMLFormatter,new QueryScorer(query));  
