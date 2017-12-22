@@ -34,6 +34,9 @@ public class ReadDocs {
 	 * 读取某个文档中的所有内容
 	 */
 	public static String getTotalInfoPerDoc() { //全部结果输出时则返回null
+		if (!hasSet) {
+			ReadDocs.startRead("D:/workspace/SearchEngine/import/CNKI_journal_v2.txt");
+		}
 		String info = "";
 		String temp;
 		try {
@@ -110,7 +113,7 @@ public class ReadDocs {
 	 */
 	public static String getFieldInfoperDoc(String fieldName) {
 		if (!hasSet) {
-			ReadDocs.startRead("import/CNKI_journal_v2.txt");
+			ReadDocs.startRead("D:/workspace/SearchEngine/import/CNKI_journal_v2.txt");
 		}
 		String totalString = ReadDocs.getTotalInfoPerDoc();
 		if (totalString == null) {
