@@ -5,6 +5,7 @@ import org.apache.lucene.search.ScoreDoc;
 
 public class superSearcher {
 	public void getSearch(int searchState, int analyzerMethod, String query) {}
+	public void getSearch(int searchState, int analyzerMethod, String[] query) {} //为多域检索所留的接口
 	
 	public ScoreDoc[] hits;
 	public String getHighlightQuery(String query) {

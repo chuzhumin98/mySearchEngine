@@ -95,6 +95,17 @@ public class IndexTable {
 		json1.put("classType", 0); //0表示TestIndexSearcher,1表示SearcherWithWord2Vec
 		json1.put("analyzerMethod", 3); //表示采用的分词工具类型
 		tables.add(json1);
+		
+		/*
+		 * index:7
+		 * 多域检索，采用默认的IKAnalyzer
+		 */
+		json1 = new JSONObject();
+		json1.put("searchState", 0); //决定调用的域类型
+		json1.put("indexPath", 0); //index所存储的位置
+		json1.put("classType", 0); //0表示TestIndexSearcher,1表示SearcherWithWord2Vec
+		json1.put("analyzerMethod", 0); //表示采用的分词工具类型
+		tables.add(json1);
 	}
 	
 	public static IndexTable getInstance() {
@@ -105,6 +116,31 @@ public class IndexTable {
 	}
 	
 	public ScoreDoc[] getSearchResult(int method, String query) {
+		IndexTable mytable = IndexTable.getInstance();
+		JSONObject json1 = mytable.tables.get(method);
+		//System.out.println(json1.toString());
+		if (IndexTable.myEngine[method] == null) {
+			//System.out.println("is null");
+			int indexPath = json1.getInt("indexPath");
+			if (json1.getInt("classType") == 0) {				
+				IndexTable.myEngine[method] = new TestIndexSearcher(TestIndexSearcher.pathIndex[indexPath]);
+			}
+			if (json1.getInt("classType") == 1) {
+				//System.out.println("is new");
+				IndexTable.myEngine[method] = new SearcherWithWord2Vec(
+						SearcherWithWord2Vec.pathIndex[indexPath]);	//找到对应方法的路径
+			}
+		}
+		int searchState = json1.getInt("searchState");
+		int analyzerMethod = json1.getInt("analyzerMethod");
+		IndexTable.myEngine[method].getSearch(searchState, analyzerMethod, query);
+		return IndexTable.myEngine[method].hits;
+	}
+	
+	/*
+	 * 针对多域检索的方法
+	 */
+	public ScoreDoc[] getSearchResult(int method, String[] query) {
 		IndexTable mytable = IndexTable.getInstance();
 		JSONObject json1 = mytable.tables.get(method);
 		//System.out.println(json1.toString());
@@ -144,5 +180,7 @@ public class IndexTable {
 	public static void main(String[] args) {
 		IndexTable table = IndexTable.getInstance();
 		table.getSearchResult(6, "江泽民");
+		String[] tmp = {"建筑","张大庆","建筑","2000"};
+		table.getSearchResult(7, tmp);
 	}
 }

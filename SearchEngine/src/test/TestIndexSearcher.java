@@ -13,8 +13,11 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -161,6 +164,36 @@ public class TestIndexSearcher extends superSearcher {
 	}
 	
 	/*
+	 * 多域查询，每个域有自己的查询词
+	 */
+	/*
+	 * 在给定的多个域中搜索结果
+	 */
+	public TopDocs searchQuerysFields(String[] queryString, int maxnum){ //已设置fileNames和fieldBoosts
+		try {
+			getFieldsName();
+			BooleanQuery booleanQuery = new BooleanQuery(); //新建一个布尔查询
+			
+			int count = 0; //查询需要搜索的域的数量
+			for (int i = 0; i < this.myfieldsName.length; i++) {
+				if (queryString[i] != null && !queryString[i].equals("")) {
+					QueryParser parser1 = new QueryParser(Version.LUCENE_35, this.myfieldsName[i], analyzer); 
+			        Query myQuery = parser1.parse(queryString[i]); 
+			        booleanQuery.add(myQuery, BooleanClause.Occur.MUST); 
+			        myQuery.setBoost(this.boostsValue[i]);
+					count++;
+				}
+			}
+			System.out.println("using field:"+count);
+			TopDocs results = searcher.search(booleanQuery, maxnum);
+			return results;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/*
 	 * 将所有内容看成一个域进行搜索
 	 */
 	public TopDocs searchQueryTotal(String queryString, int maxnum){ 
@@ -221,6 +254,29 @@ public class TestIndexSearcher extends superSearcher {
 						"score:"+hits[i].score);
 			}
 		}	 
+	}
+	
+	/*
+	 * 整合的方法
+	 */
+	public void getSearch(int searchState, int analyzerMethod, String[] query) {
+		this.searchState = searchState;
+		this.analyzerMethod = analyzerMethod;
+		this.initSearcher();
+		/*
+		 * query:江泽民，非常好地诠释CJK存在一定问题的例子
+		 */
+		System.out.println("query:"+query);
+		//TopDocs results=search.searchQueryOneField("2012", "年", 100);
+		TopDocs results;
+		results = this.searchQuerysFields(query, 1000);
+		hits = results.scoreDocs;
+		System.out.println("the result number:"+hits.length);
+		for (int i = 0; i < Math.min(hits.length, 10); i++) { // output raw format
+			Document doc = this.getDoc(hits[i].doc);
+			System.out.println("top "+ (i+1) + ":\n"+this.toDocString(doc)+
+					"score:"+hits[i].score);
+		}		 
 	}
 	
 	/*
@@ -317,7 +373,9 @@ public class TestIndexSearcher extends superSearcher {
 	public static void main(String[] args){
 		TestIndexSearcher search=new TestIndexSearcher(
 				TestIndexSearcher.pathIndex[2]);	//找到对应方法的路径
-		search.getSearch(0, 2, "江泽民");
-		search.hightLight("江泽民");
+		//search.getSearch(0, 2, "江泽民");
+		//search.hightLight("江泽民");
+		String[] tmp = {"建筑","张大庆","建筑","2000"};
+		search.getSearch(0, 2, tmp);
 	}
 }
