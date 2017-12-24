@@ -44,7 +44,6 @@ public class LuceneServer extends HttpServlet{
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=utf-8");
 		request.setCharacterEncoding("utf-8");
-		String queryString = request.getParameter("query"); //query 信息
 		String pageString = request.getParameter("page"); //页编号信息
 		String methodString = request.getParameter("method");
 		int searchMethod = 2; //通过前端过来的数据分析出方法
@@ -59,6 +58,8 @@ public class LuceneServer extends HttpServlet{
 			page = Integer.parseInt(pageString);
 		}
 		if (searchMethod != 7) { //不为多域检索的处理方式
+			System.out.println("Hello for visit simple query");
+			String queryString = request.getParameter("query"); //query 信息
 			if(queryString == null){
 				System.err.println("the query is null");
 				//request.getRequestDispatcher("/Image.jsp").forward(request, response);
@@ -98,6 +99,7 @@ public class LuceneServer extends HttpServlet{
 						response);
 			}
 		} else { //为多域检索的处理方式
+			System.out.println("hello for visit multi field query!");
 			String[] querys = new String [4];
 			boolean isNull = true;
 			for (int i = 0; i < 4; i++) {
@@ -123,6 +125,7 @@ public class LuceneServer extends HttpServlet{
 							for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
 								Document doc = IndexTable.myEngine[searchMethod].getDoc(hits[i].doc);
 								//输出高亮之后的文本
+								fieldResult[i] = doc.get(fields[k]);
 								//fieldResult[i] = IndexTable.myEngine
 										//[searchMethod].hightLightString(querys, doc.get(fields[k]));
 							}
@@ -137,7 +140,7 @@ public class LuceneServer extends HttpServlet{
 				System.out.println("json:"+jsonTotal.toString());
 				
 				request.setAttribute("resultNum", allResult.length);
-				request.setAttribute("currentQuery",queryString);
+				//request.setAttribute("currentQuery",queryString);
 				request.setAttribute("currentPage", page);
 				request.setAttribute("searchMethod", searchMethod);
 				request.setAttribute("results", jsonTotal);
