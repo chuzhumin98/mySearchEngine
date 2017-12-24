@@ -55,12 +55,13 @@ System.out.println(basePath);
 <%
 	String currentQuery=(String) request.getAttribute("currentQuery");
 	int currentPage=(Integer) request.getAttribute("currentPage");
+	int searchMethod = (Integer) request.getAttribute("searchMethod");
 %>
 
 <script type="text/javascript">  
 function myCheck()  
 {  
-   for(var i=0;i<document.form1.elements.length-1;i++)  
+   for(var i=0;i<1;i++)  
    {  
       if(document.form1.elements[i].value=="")  
       {  
@@ -73,24 +74,51 @@ function myCheck()
     
 }  
 </script>  
+<script type="text/javascript">
+    function setMethod(method,methodName){
+    	document.getElementById("method").value = method;
+    	alert("succeed change to "+methodName);
+    }
+</script>
 
-<nav class="navbar navbar-default" role="navigation" style="height:55px;border-style:none"></nav>
+
+<nav class="navbar navbar-default" role="navigation" style="height:45px;border-style:none">
+</nav>
 <div id="Layer1">
-<form class="form-inline" id="form1" name="form1" method="get" action="LuceneServer" onSubmit="return myCheck()">
-<nav class="navbar navbar-default" role="navigation" style="height:81px;border-style:none">
+<form class="form-inline" id="form1" name="form1" method="get" action="LuceneServer" onsubmit="return myCheck()">
+<nav class="navbar navbar-default" role="navigation" style="height:111px;border-style:none;left:0px;">
     <div class="container-fluid"> 
         <form class="navbar-form navbar-left" role="search">
         	<img src=<%=path+"/images/cnki2.jpg" %>  alt="Cnki Search" width="50" height="50" class="img-rounded"/>
             <input style="width:570px;height:30px" type="text" class="form-control" id="searchInput" placeholder="input something..." name="query" value="<%=currentQuery %>">
+            <input type="hidden" name="method" value="<%=searchMethod %>" id="method" />
             <button style="height:30px;width:60px" class="btn btn-success" type="submit">搜索</button>
         </form>
-    </div>
+        <br/>
+    
+	</div>
+	<nav class="navbar navbar-default" role="navigation" style="height:45px;border-style:none;left:70px;">
+  <div class="btn-group" role="group" aria-label="...">
+  <button type="button" class="btn btn btn-primary" onclick="setMethod(2,'IKAnalyzer')">IKAnalyzer</button>
+  <button type="button" class="btn btn btn-primary" onclick="setMethod(3,'StandardAnalyzer')">StandardAnalyzer</button>
+  <button type="button" class="btn btn btn-primary" onclick="setMethod(4,'CJKAnalyzer')">CJKAnalyzer</button>
+  <button type="button" class="btn btn btn-primary" onclick="setMethod(6,'ComplexAnalyzer')">ComplexAnalyzer</button>
+</div>
+<div class="btn-group" role="group" aria-label="...">
+  <button type="button" class="btn btn-info" onclick="setMethod(0,'Word2vec')">Word2vec</button>
+  <button type="button" class="btn btn-info" onclick="setMethod(1,'Toy Model')">Toy Model</button>
+  <button type="button" class="btn btn-info" onclick="setMethod(5,'English Query')">English Query</button>
+</div>
+	
+	</nav>	
+	
 </nav>
+
 </form>
 </div>
 
+
 <%  	
-	int searchMethod = (Integer) request.getAttribute("searchMethod");
 	String[] fields = IndexTable.getFields(searchMethod);
 	int fieldNum = fields.length;
 	JSONObject results = JSONObject.fromObject(request.getAttribute("results"));	
@@ -106,7 +134,7 @@ function myCheck()
 	int resultNum = (Integer) request.getAttribute("resultNum");
 	
 %>
-<div id="Layer2" style="top: 120px; height: 900px; left:185px">
+<div id="Layer2" style="top: 160px; height: 900px; left:185px">
   <div id="imagediv">共搜到<%= resultNum %>条结果：
   <br/></br/>
   <Table style="left: 0px; width: 594px;">
