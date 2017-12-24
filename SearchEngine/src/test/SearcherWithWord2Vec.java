@@ -18,11 +18,17 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
+import org.apache.lucene.search.highlight.QueryScorer;
+import org.apache.lucene.search.highlight.SimpleFragmenter;
+import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
@@ -264,6 +270,80 @@ public class SearcherWithWord2Vec extends superSearcher {
 						"score:"+hits[i].score);
 			}
 		}	
+	}
+	
+	/*
+	 * 拼接一下需要高亮的字符串
+	 * (non-Javadoc)
+	 * @see server.superSearcher#getHighlightQuery(java.lang.String)
+	 */
+	public String getHighlightQuery(String query) {
+		String highlightQuery = query;
+		StringReader reader = new StringReader(query);  
+	    TokenStream ts = analyzer.tokenStream("", reader);  
+	    CharTermAttribute term = ts.getAttribute(CharTermAttribute.class); 
+	    ArrayList<String> splits = new ArrayList<String>();
+		try {
+			while(ts.incrementToken()){  
+				splits.add(term.toString()); 
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		LoadModel model = LoadModel.getInstance();
+		int size = splits.size(); //切分之后词的数量
+		for (int i = 0; i < size; i++) {
+			Set<WordEntry> simTerm = model.distance(splits.get(i));
+			//System.out.println(splits.get(i)+":"+simTerm.toString());
+			for (WordEntry item: simTerm) {
+				highlightQuery += " "+item.name;		
+			}
+		}
+		return highlightQuery;
+	}
+	
+	/*
+	 * 获取高亮后的字符串
+	 * (non-Javadoc)
+	 * @see server.superSearcher#hightLightString(java.lang.String, java.lang.String)
+	 */
+	public String hightLightString(String query, String text) {
+		String highlightQuery = this.getHighlightQuery(query);
+		QueryParser queryParser;
+		if (this.searchState == -1) {
+			queryParser = new QueryParser(Version.LUCENE_35, "total", analyzer);
+		} else {
+			queryParser = new org.apache.lucene.queryParser.MultiFieldQueryParser
+					(Version.LUCENE_35, myfieldsName, analyzer, fieldBoosts);	
+		}
+           
+        Query myQuery = null;
+		try {
+			myQuery = queryParser.parse(highlightQuery);
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}  
+          
+        SimpleHTMLFormatter simpleHTMLFormatter = new SimpleHTMLFormatter("<font color='red'>", "</font>");      
+        Highlighter highlighter = new Highlighter(simpleHTMLFormatter,new QueryScorer(myQuery));  
+        highlighter.setTextFragmenter(new SimpleFragmenter(1024));   
+        TokenStream tokenStream = analyzer.tokenStream(text,new StringReader(text));     
+        String highLightText = null;
+		try {
+			highLightText = highlighter.getBestFragment(tokenStream, text);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidTokenOffsetsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+        if (highLightText == null) {
+        	highLightText = text;
+        }   
+        return highLightText;
 	}
 	
 	public static void main(String[] args) throws IOException{

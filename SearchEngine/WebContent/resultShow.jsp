@@ -27,7 +27,7 @@ System.out.println(basePath);
 	position:absolute;
 	left:0px;
 	top:31px;
-	width:1400px;
+	width:1600px;
 	height:100px;
 	z-index:1;
 }
@@ -86,7 +86,7 @@ function myCheck()
 </nav>
 <div id="Layer1">
 <form class="form-inline" id="form1" name="form1" method="get" action="LuceneServer" onsubmit="return myCheck()">
-<nav class="navbar navbar-default" role="navigation" style="height:111px;border-style:none;left:0px;">
+<nav class="navbar navbar-default" role="navigation" style="height:111px;border-style:none;left:0px;width:1600px;">
     <div class="container-fluid"> 
         <form class="navbar-form navbar-left" role="search">
         	<img src=<%=path+"/images/cnki2.jpg" %>  alt="Cnki Search" width="50" height="50" class="img-rounded"/>
@@ -160,7 +160,7 @@ function myCheck()
   </div>
   <div>
   <br/>
-  <div align="center"> <img src=<%=path+"/images/tsiiinghua.png" %> alt="Tsiiiiiiiinghua" width="360" height="60"/></div>
+  <div align="center"> <img src=<%=path+"/images/huawen.jpg" %> alt="Tsiiiiiiiinghua" width="360" height="60"/></div>
   	<p align="center"><font size="3">
   		<%if(currentPage!=1){ %><a href="LuceneServer?query=<%=currentQuery%>&page=<%=1%>"> 首页</a>
   		<%}else{ %> 首页<%} %>
