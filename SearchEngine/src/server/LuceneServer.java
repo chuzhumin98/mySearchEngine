@@ -104,8 +104,10 @@ public class LuceneServer extends HttpServlet{
 			boolean isNull = true;
 			for (int i = 0; i < 4; i++) {
 				querys[i] = request.getParameter("query"+(i+1));
-				if (querys[i] != null) {
+				if (querys[i] != null && !querys[i].equals("")) {
 					isNull = false;
+				} else {
+					querys[i] = "";
 				}
 			}
 			if(isNull){
@@ -140,7 +142,7 @@ public class LuceneServer extends HttpServlet{
 				System.out.println("json:"+jsonTotal.toString());
 				
 				request.setAttribute("resultNum", allResult.length);
-				//request.setAttribute("currentQuery",queryString);
+				request.setAttribute("currentQuery",querys);
 				request.setAttribute("currentPage", page);
 				request.setAttribute("searchMethod", searchMethod);
 				request.setAttribute("results", jsonTotal);

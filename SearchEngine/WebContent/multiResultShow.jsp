@@ -48,34 +48,47 @@ System.out.println(basePath);
 	z-index:3;
 }
 -->
+div{margin:5px;border:0;padding:0;}
 </style>
 </head>
 
 <body>
 <%
-	String currentQuery=(String) request.getAttribute("currentQuery");
+	String[] currentQuery=(String[]) request.getAttribute("currentQuery");
+	if (currentQuery == null) {
+		currentQuery = new String [4];
+		for (int i = 0; i < 4; i++) {
+			currentQuery[i] = "";
+		}
+	}
 	int currentPage = 1;
 	if (request.getAttribute("currentPage") != null) {
 		currentPage = (Integer) request.getAttribute("currentPage");
 	}
 	int searchMethod = 7;
+	String queryTotal = "query1="+currentQuery[0]+"&query2=" +currentQuery[1]+
+			"&query3="+currentQuery[2]+"&query4="+currentQuery[3]+"&method="+searchMethod; //针对query的完整描述
 %>
 
 <script type="text/javascript">  
 function myCheck()  
 {  
-   for(var i=0;i<1;i++)  
+   for(var i=0;i<4;i++)  
    {  
-      if(document.form1.elements[i].value=="")  
-      {  
-         alert("当前表单不能有空项");  
-         document.form1.elements[i].focus();  
-         return false;  
+      if(document.form1.elements[i].value != "")  
+      {    
+         return true;  
       }  
    }  
-   return true;  
+   alert("搜索字段不能全为空!");
+   return false;  
     
 }  
+
+function toSimple() {
+	window.event.returnValue=false
+	window.location.href="resultShow.jsp";  
+}
 </script>  
 <script type="text/javascript">
     function setMethod(method,methodName){
@@ -89,22 +102,35 @@ function myCheck()
 </nav>
 <div id="Layer1">
 <form class="form-inline" id="form1" name="form1" method="get" action="LuceneServer" onsubmit="return myCheck()">
-<nav class="navbar navbar-default" role="navigation" style="height:111px;border-style:none;left:0px;width:1600px;">
+<nav class="navbar navbar-default" role="navigation" style="height:141px;border-style:none;left:0px;width:1600px;">
     <div class="container-fluid"> 
         <form class="navbar-form navbar-left" role="search">
-        	<img src=<%=path+"/images/cnki2.jpg" %>  alt="Cnki Search" width="50" height="50" class="img-rounded"/>
-            <input style="width:570px;height:30px" type="text" class="form-control" id="searchInput1" placeholder="input something..." name="query1" value="">
-            <input style="width:570px;height:30px" type="text" class="form-control" id="searchInput2" placeholder="input something..." name="query2" value="">
-            <input style="width:570px;height:30px" type="text" class="form-control" id="searchInput3" placeholder="input something..." name="query3" value="">
-            <input style="width:570px;height:30px" type="text" class="form-control" id="searchInput4" placeholder="input something..." name="query4" value="">
+        <nav class="navbar navbar-default" role="navigation" style="height:90px;border-style:none;left:50px;width:90px;top:10px;">
+        <img src=<%=path+"/images/cnki2.jpg" %>  alt="Cnki Search" width="70" height="70" class="img-rounded"/> </nav>
+        	<nav class="navbar navbar-default" role="navigation" style="position: absolute;height:50px;border-style:none;left:180px;width:1600px;top:0px;">
+            <div>
+            <span class="label label-info">题名</span>                     
+            <input style="width:200px;height:30px" type="text" class="form-control" id="searchInput1" placeholder="input something..." name="query1" value="<%= currentQuery[0]%>">           
+            　　　
+            <span class="label label-info">作者</span> 
+            <input style="width:200px;height:30px" type="text" class="form-control" id="searchInput2" placeholder="input something..." name="query2" value="<%= currentQuery[1]%>">
+            </div>
+            <div>
+            <span class="label label-info">摘要</span>
+            <input style="width:495px;height:30px" type="text" class="form-control" id="searchInput3" placeholder="input something..." name="query3" value="<%= currentQuery[2]%>">
+            </div>
+            <div>
+            <span class="label label-info">&nbsp&nbsp年&nbsp&nbsp</span>
+            <input style="width:430px;height:30px" type="text" class="form-control" id="searchInput4" placeholder="input something..." name="query4" value="<%= currentQuery[3]%>">
             <input type="hidden" name="method" value="7" id="method" />
             <button style="height:30px;width:60px" class="btn btn-success" type="submit">搜索</button>
+            <button style="height:30px;width:120px" class="btn btn-link" onclick="toSimple()">返回普通搜索</button>
+        	</div>
+        	</nav>
         </form>
         <br/>
-    
+   </nav> 
 	</div>
-	
-</nav>
 
 </form>
 </div>
@@ -129,7 +155,7 @@ function myCheck()
 	}
 	
 %>
-<div id="Layer2" style="top: 160px; height: 900px; left:185px">
+<div id="Layer2" style="top: 180px; height: 900px; left:185px">
   <div id="imagediv">共搜到<%= resultNum %>条结果：
   <br/></br/>
   <Table style="left: 0px; width: 594px;">
@@ -160,18 +186,18 @@ function myCheck()
   		<%if(currentPage!=1){ %><a href="LuceneServer?query=<%=currentQuery%>&page=<%=1%>"> 首页</a>
   		<%}else{ %> 首页<%} %>
 		<%if(currentPage>1){ %>
-			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=currentPage-1%>"> 上一页</a>
+			<a href="LuceneServer?<%=queryTotal%>&page=<%=currentPage-1%>"> 上一页</a>
 		<%}else{ %>
 		 上一页<%}; %>
 		 <%for (int i=Math.max(1,currentPage-5);i<currentPage;i++){%>
-			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
+			<a href="LuceneServer?<%=queryTotal%>&page=<%=i%>"><%=i%></a>
 		<%}; %>
 		<strong> <%=currentPage%></strong>
 		<%for (int i=currentPage+1;i<=Math.min(currentPage+5,(resultNum+9)/10);i++){ %>
-			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
+			<a href="LuceneServer?<%=queryTotal%>&page=<%=i%>"><%=i%></a>
 		<%} %>
 		<%if(currentPage*10 >= resultNum){%> 下一页<%}else { %>
-		<a href="LuceneServer?query=<%=currentQuery%>&page=<%=currentPage+1%>"> 下一页</a>
+		<a href="LuceneServer?<%=queryTotal%>&page=<%=currentPage+1%>"> 下一页</a>
 		<%} %>
 		</font>
 	</p>

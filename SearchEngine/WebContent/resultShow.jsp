@@ -54,8 +54,18 @@ System.out.println(basePath);
 <body>
 <%
 	String currentQuery=(String) request.getAttribute("currentQuery");
-	int currentPage=(Integer) request.getAttribute("currentPage");
-	int searchMethod = (Integer) request.getAttribute("searchMethod");
+	if (currentQuery == null) {
+		currentQuery = "";
+	}
+	int currentPage = 1;
+	if (request.getAttribute("currentPage") != null) {
+		currentPage = (Integer) request.getAttribute("currentPage");
+	}
+	int searchMethod = 2;
+	if (request.getAttribute("searchMethod") != null) {
+		searchMethod = (Integer) request.getAttribute("searchMethod");
+	}
+	String queryTotal = "query="+currentQuery+"&method="+searchMethod; //针对query的完整描述
 %>
 
 <script type="text/javascript">  
@@ -73,6 +83,10 @@ function myCheck()
    return true;  
     
 }  
+function toDomain() {
+	window.event.returnValue=false
+	window.location.href="multiResultShow.jsp";  
+}
 </script>  
 <script type="text/javascript">
     function setMethod(method,methodName){
@@ -93,6 +107,7 @@ function myCheck()
             <input style="width:570px;height:30px" type="text" class="form-control" id="searchInput" placeholder="input something..." name="query" value="<%=currentQuery %>">
             <input type="hidden" name="method" value="<%=searchMethod %>" id="method" />
             <button style="height:30px;width:60px" class="btn btn-success" type="submit">搜索</button>
+            <button style="height:30px;width:120px" class="btn btn-link" onclick="toDomain()">前往多域搜索</button>
         </form>
         <br/>
     
@@ -131,7 +146,10 @@ function myCheck()
 		}
 		
 	}
-	int resultNum = (Integer) request.getAttribute("resultNum");
+	int resultNum = 0;
+	if (request.getAttribute("resultNum") != null) {
+		resultNum = (Integer) request.getAttribute("resultNum");
+	}
 	
 %>
 <div id="Layer2" style="top: 160px; height: 900px; left:185px">
@@ -165,18 +183,18 @@ function myCheck()
   		<%if(currentPage!=1){ %><a href="LuceneServer?query=<%=currentQuery%>&page=<%=1%>"> 首页</a>
   		<%}else{ %> 首页<%} %>
 		<%if(currentPage>1){ %>
-			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=currentPage-1%>"> 上一页</a>
+			<a href="LuceneServer?<%=queryTotal%>&page=<%=currentPage-1%>"> 上一页</a>
 		<%}else{ %>
 		 上一页<%}; %>
 		 <%for (int i=Math.max(1,currentPage-5);i<currentPage;i++){%>
-			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
+			<a href="LuceneServer?<%=queryTotal%>&page=<%=i%>"><%=i%></a>
 		<%}; %>
 		<strong> <%=currentPage%></strong>
 		<%for (int i=currentPage+1;i<=Math.min(currentPage+5,(resultNum+9)/10);i++){ %>
-			<a href="LuceneServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
+			<a href="LuceneServer?<%=queryTotal%>&page=<%=i%>"><%=i%></a>
 		<%} %>
 		<%if(currentPage*10 >= resultNum){%> 下一页<%}else { %>
-		<a href="LuceneServer?query=<%=currentQuery%>&page=<%=currentPage+1%>"> 下一页</a>
+		<a href="LuceneServer?<%=queryTotal%>&page=<%=currentPage+1%>"> 下一页</a>
 		<%} %>
 		</font>
 	</p>
