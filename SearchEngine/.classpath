@@ -25,5 +25,9 @@
 	<classpathentry kind="lib" path="lib/Lucene/lucene-core-3.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/Lucene/lucene-highlighter-3.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/Lucene/mmseg4j-all-with-dic-1.8.6.jar"/>
+	<classpathentry kind="lib" path="lib/translate/apache-httpcomponents-httpcore.jar"/>
+	<classpathentry kind="lib" path="lib/translate/httpclient-4.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/translate/jsoup-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/translate/org.apache.commons.io.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

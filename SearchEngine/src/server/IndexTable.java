@@ -7,6 +7,7 @@ import org.apache.lucene.search.ScoreDoc;
 import net.sf.json.JSONObject;
 import test.SearcherWithWord2Vec;
 import test.TestIndexSearcher;
+import translate.TranslateUtil;
 
 public class IndexTable {
 	public static IndexTable myTable = null;
@@ -106,6 +107,17 @@ public class IndexTable {
 		json1.put("classType", 0); //0表示TestIndexSearcher,1表示SearcherWithWord2Vec
 		json1.put("analyzerMethod", 0); //表示采用的分词工具类型
 		tables.add(json1);
+		
+		/*
+		 * index:8
+		 * IKanalyzer对于普通中文文本的检索
+		 */
+		json1 = new JSONObject();
+		json1.put("searchState", 0); //决定调用的域类型
+		json1.put("indexPath", 0); //index所存储的位置
+		json1.put("classType", 0); //0表示TestIndexSearcher,1表示SearcherWithWord2Vec
+		json1.put("analyzerMethod", 0); //表示采用的分词工具类型
+		tables.add(json1);
 	}
 	
 	public static IndexTable getInstance() {
@@ -131,10 +143,22 @@ public class IndexTable {
 						SearcherWithWord2Vec.pathIndex[indexPath]);	//找到对应方法的路径
 			}
 		}
+		String myQuery = query;
+		if (method == 8) {
+			System.out.println("your query:"+query);
+			try {
+				myQuery = TranslateUtil.translate(query, TranslateUtil.AUTO, TranslateUtil.CHINA);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("translate:"+myQuery);
+		}
+		
 		int searchState = json1.getInt("searchState");
 		int analyzerMethod = json1.getInt("analyzerMethod");
-		IndexTable.myEngine[method].getSearch(searchState, analyzerMethod, query);
-		return IndexTable.myEngine[method].hits;
+		IndexTable.myEngine[method].getSearch(searchState, analyzerMethod, myQuery);
+		return IndexTable.myEngine[method].hits;		
 	}
 	
 	/*
@@ -179,8 +203,8 @@ public class IndexTable {
 	
 	public static void main(String[] args) {
 		IndexTable table = IndexTable.getInstance();
-		table.getSearchResult(6, "江泽民");
-		String[] tmp = {"建筑","张大庆","建筑","2000"};
-		table.getSearchResult(7, tmp);
+		table.getSearchResult(8, "data");
+		//String[] tmp = {"建筑","张大庆","建筑","2000"};
+		//table.getSearchResult(7, tmp);
 	}
 }
