@@ -12,6 +12,7 @@ import org.apache.lucene.search.ScoreDoc;
 
 import net.sf.json.JSONObject;
 import server.IndexTable;
+import translate.TranslateUtil;
 
 
 
@@ -64,10 +65,31 @@ public class LuceneServer extends HttpServlet{
 				System.err.println("the query is null");
 				//request.getRequestDispatcher("/Image.jsp").forward(request, response);
 			} else {
+				String myQuery = queryString;
+				if (searchMethod == 8) {
+					//System.out.println("your query:"+query);
+					try {
+						myQuery = TranslateUtil.translate(queryString, TranslateUtil.AUTO, TranslateUtil.CHINA);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					System.out.println("translate:"+myQuery);
+				}
+				if (searchMethod == 9) {
+					//System.out.println("your query:"+query);
+					try {
+						myQuery = TranslateUtil.translate(queryString, TranslateUtil.AUTO, TranslateUtil.ENGLISH);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					System.out.println("translate:"+myQuery);
+				}
 				JSONObject jsonTotal = new JSONObject();
 				System.out.println("your query:" + queryString);
 				IndexTable table = IndexTable.getInstance();
-				ScoreDoc[] allResult = table.getSearchResult(searchMethod, queryString);
+				ScoreDoc[] allResult = table.getSearchResult(searchMethod, myQuery);
 				if (allResult != null) {
 					ScoreDoc[] hits = showList(allResult, page);
 					if (hits != null) {
@@ -78,7 +100,7 @@ public class LuceneServer extends HttpServlet{
 								Document doc = IndexTable.myEngine[searchMethod].getDoc(hits[i].doc);
 								//输出高亮之后的文本
 								fieldResult[i] = IndexTable.myEngine
-										[searchMethod].hightLightString(queryString, doc.get(fields[k]));
+										[searchMethod].hightLightString(myQuery, doc.get(fields[k]));
 							}
 							jsonTotal.put(fields[k], fieldResult);
 						}	

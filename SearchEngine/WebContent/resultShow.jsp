@@ -48,6 +48,7 @@ System.out.println(basePath);
 	z-index:3;
 }
 -->
+div{margin:5px;border:0;padding:0;}
 </style>
 </head>
 
@@ -100,7 +101,7 @@ function toDomain() {
 </nav>
 <div id="Layer1">
 <form class="form-inline" id="form1" name="form1" method="get" action="LuceneServer" onsubmit="return myCheck()">
-<nav class="navbar navbar-default" role="navigation" style="height:111px;border-style:none;left:0px;width:1600px;">
+<nav class="navbar navbar-default" role="navigation" style="height:161px;border-style:none;left:0px;width:1600px;">
     <div class="container-fluid"> 
         <form class="navbar-form navbar-left" role="search">
         	<img src=<%=path+"/images/cnki2.jpg" %>  alt="Cnki Search" width="50" height="50" class="img-rounded"/>
@@ -118,11 +119,13 @@ function toDomain() {
   <button type="button" class="btn btn btn-primary" onclick="setMethod(3,'StandardAnalyzer')">StandardAnalyzer</button>
   <button type="button" class="btn btn btn-primary" onclick="setMethod(4,'CJKAnalyzer')">CJKAnalyzer</button>
   <button type="button" class="btn btn btn-primary" onclick="setMethod(6,'ComplexAnalyzer')">ComplexAnalyzer</button>
-</div>
+</div></br>
 <div class="btn-group" role="group" aria-label="...">
   <button type="button" class="btn btn-info" onclick="setMethod(0,'Word2vec')">Word2vec</button>
   <button type="button" class="btn btn-info" onclick="setMethod(1,'Toy Model')">Toy Model</button>
   <button type="button" class="btn btn-info" onclick="setMethod(5,'English Query')">English Query</button>
+  <button type="button" class="btn btn-info" onclick="setMethod(8,'Cross language query to Chinese')">Cross to Chinese</button>
+  <button type="button" class="btn btn-info" onclick="setMethod(9,'Cross language query to English')">Cross to English</button>
 </div>
 	
 	</nav>	
@@ -152,7 +155,7 @@ function toDomain() {
 	}
 	
 %>
-<div id="Layer2" style="top: 160px; height: 900px; left:185px">
+<div id="Layer2" style="top: 210px; height: 900px; left:100px">
   <div id="imagediv">共搜到<%= resultNum %>条结果：
   <br/></br/>
   <Table style="left: 0px; width: 594px;">
