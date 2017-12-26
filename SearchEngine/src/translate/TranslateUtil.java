@@ -181,3 +181,5 @@ public class TranslateUtil {
 	 System.out.println("translate:"+text);
  }
 }
+
+  

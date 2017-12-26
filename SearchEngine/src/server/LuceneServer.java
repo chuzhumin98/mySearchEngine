@@ -150,8 +150,10 @@ public class LuceneServer extends HttpServlet{
 								Document doc = IndexTable.myEngine[searchMethod].getDoc(hits[i].doc);
 								//输出高亮之后的文本
 								fieldResult[i] = doc.get(fields[k]);
-								//fieldResult[i] = IndexTable.myEngine
-										//[searchMethod].hightLightString(querys, doc.get(fields[k]));
+								if (querys[k] != null && !querys[k].equals("")) {
+									fieldResult[i] = IndexTable.myEngine
+											[searchMethod].hightLightString(querys[k], doc.get(fields[k]));
+								}
 							}
 							jsonTotal.put(fields[k], fieldResult);
 						}	
